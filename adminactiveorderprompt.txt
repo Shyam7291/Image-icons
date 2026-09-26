@@ -1,0 +1,1034 @@
+Enhance the existing StoneRate Admin Active Orders page by adding a separate view for active orders created from Transporter sample requests.
+
+FILE TO UPDATE
+
+Update the existing page:
+
+src/pages/AdminActiveOrders.js
+
+If the project currently uses JSX, preserve the existing extension and path.
+
+IMPORTANT SCOPE
+
+This is a FRONTEND-ONLY enhancement.
+
+Do not touch, edit, refactor, replace, or reconnect any backend file.
+
+Do not modify:
+
+- Buyer Active Orders backend
+- Buyer Active Orders API
+- getAdminActiveOrders()
+- Existing Buyer order response mapping
+- Existing Buyer Active Order cards
+- Existing Buyer status handling
+- Existing Buyer order details navigation
+- Existing Buyer search
+- Existing Buyer status filters
+- Existing Buyer date filters
+- Existing Buyer sorting
+- Existing Buyer metrics
+- Existing Buyer refresh behavior
+- Existing Buyer loading and error handling
+- Existing Admin navigation
+- Existing App.js integration
+- Existing database structure
+
+The current Buyer Active Orders workflow is already functional and must continue working exactly as it currently works.
+
+Only add:
+
+1. A source-selection filter at the top of the existing Active Orders page
+2. A new frontend-only By Transporter view
+3. Four separate Transporter order metric cards
+4. Transporter active-order cards
+5. Transporter-specific search, filtering, sorting, loading, error, and empty states
+6. Callback-driven preparation for backend integration later
+
+Do not connect a new backend endpoint in this task.
+
+Do not fabricate Transporter order records for production.
+
+Do not replace real Buyer orders with mock data.
+
+PRIMARY DESIGN REQUIREMENT
+
+Focus strongly on making the enhancement visually stunning, attractive, premium, modern, and production-ready.
+
+Use the existing AdminActiveOrders page as the main design reference.
+
+Preserve its existing:
+
+- StoneRate Admin branding
+- Header
+- White canvas
+- Orange accent system
+- Typography
+- Spacing
+- Metric-card treatment
+- Active-order card style
+- Shadows
+- Background effects
+- Search controls
+- Status filters
+- Date filters
+- Sorting controls
+- Bottom navigation
+- Loading skeletons
+- Responsive behavior
+- Interaction patterns
+
+The new By Buyer / By Transporter switcher and Transporter order cards must look like native parts of the current Active Orders page.
+
+Do not introduce an unrelated color palette or a separate design system.
+
+Use the current `ao-` class naming convention for all new styles.
+
+Do not change the existing Buyer card design.
+
+PAGE SOURCE FILTER
+
+Add a premium source filter near the top of the page.
+
+Place it:
+
+- Below the Active Orders page heading, or
+- Immediately above the metric cards
+
+Select whichever placement best fits the existing layout without disrupting the header.
+
+The source filter must contain:
+
+- By Buyer
+- By Transporter
+
+Suggested internal values:
+
+- buyer
+- transporter
+
+Default selection:
+
+buyer
+
+Use state such as:
+
+const [orderSource, setOrderSource] = useState("buyer");
+
+The control should be a polished segmented switcher or premium tab control, not a basic dropdown.
+
+Each option should include an appropriate icon:
+
+- Buyer or user icon for By Buyer
+- Truck icon for By Transporter
+
+The active source must be clearly visible through:
+
+- Stronger text weight
+- StoneRate orange accent
+- Selected background
+- Subtle shadow
+- Clear active indicator
+- Smooth transition
+
+The inactive source must remain:
+
+- Readable
+- Accessible
+- Easy to tap
+- Visually consistent with the page
+
+Use proper tab semantics or `aria-pressed`.
+
+SOURCE-SWITCHING BEHAVIOR
+
+When `orderSource === "buyer"`:
+
+- Render the current Buyer Active Orders view exactly as it currently works
+- Continue using `getAdminActiveOrders()`
+- Preserve the existing four Buyer metric cards
+- Preserve the current Buyer search value
+- Preserve the current Buyer status filter
+- Preserve the current Buyer date filter
+- Preserve the current Buyer sorting
+- Preserve the current Buyer order cards
+- Preserve the current View Order action
+- Preserve the current loading state
+- Preserve the current error state
+- Preserve the current refresh behavior
+- Preserve the current bottom navigation
+
+When `orderSource === "transporter"`:
+
+- Display four Transporter summary metric cards
+- Display Transporter active-order cards
+- Use only Transporter order props supplied to the page
+- Do not call `getAdminActiveOrders()` to obtain Transporter orders
+- Do not add a backend request in this task
+- Do not mix Buyer order data into Transporter cards
+- Do not fabricate Transporter order records
+- Keep the view ready for future backend integration
+
+Keep Buyer and Transporter UI state separate.
+
+For example:
+
+const [buyerQuery, setBuyerQuery] = useState("");
+const [buyerFilter, setBuyerFilter] = useState("ALL");
+const [buyerSort, setBuyerSort] = useState("attention");
+
+const [transporterQuery, setTransporterQuery] = useState("");
+const [transporterFilter, setTransporterFilter] = useState("ALL");
+const [transporterSort, setTransporterSort] = useState("newest");
+
+Switching between By Buyer and By Transporter must not reset the other view’s filters unless the user explicitly resets them.
+
+Returning to By Buyer must restore the previous Buyer view state.
+
+NEW OPTIONAL COMPONENT PROPS
+
+Add only the minimum props needed for the Transporter view:
+
+{
+  transporterOrders = [],
+  transporterOrdersLoading = false,
+  transporterOrdersError = "",
+  onRefreshTransporterOrders = () => {},
+  onViewTransporterOrder = () => {}
+}
+
+Do not change the behavior of existing props.
+
+If equivalent generic props already exist, reuse them carefully rather than adding duplicate concepts.
+
+Do not add an API call inside this page for Transporter orders during this task.
+
+EXPECTED TRANSPORTER ORDER STRUCTURE
+
+Support frontend Transporter active-order objects using a structure such as:
+
+{
+  id: "TR-260726-001",
+  transporterRequestId: "TR-260726-001",
+  transporterDeliveryId: "TD-260726-002",
+
+  status: "new",
+
+  transporterId: "T100001",
+  transporterName: "ABC Transport Agency",
+
+  sellerId: "S100001",
+  sellerName: "Stone Supplier",
+
+  materialName: "20mm Crushed Stone",
+  quantity: 20,
+  quantityUnit: "ton",
+
+  location: "Sonbhadra, Uttar Pradesh",
+  pickupLocation: "Sonbhadra, Uttar Pradesh",
+
+  confirmedAt: "2026-07-26T10:30:00.000Z",
+  loadingStartedAt: null,
+  dispatchedAt: null,
+  updatedAt: "2026-07-26T10:30:00.000Z"
+}
+
+Also support multiple materials when the backend later provides:
+
+{
+  materials: [
+    {
+      id: "material-1",
+      name: "20mm Crushed Stone",
+      materialName: "20mm Crushed Stone",
+      quantity: 20,
+      quantityUnit: "ton"
+    }
+  ]
+}
+
+Do not hardcode this example into production rendering.
+
+Do not create synthetic orders.
+
+TRANSPORTER ORDER STATUS SUPPORT
+
+Support these statuses:
+
+- new
+- loading
+- dispatched
+
+Display them as:
+
+- NEW
+- LOADING
+- DISPATCHED
+
+Allow safe normalization from values such as:
+
+- NEW
+- LOADING
+- DISPATCHED
+- IN_TRANSIT
+
+If `IN_TRANSIT` represents the same operational state as dispatched in the future API, display:
+
+DISPATCHED
+
+Do not modify the backend status.
+
+Do not infer status from timestamps when a valid status is supplied.
+
+STATUS VISUALS
+
+NEW:
+
+- Blue or orange accent
+- New-order indicator
+- Represents a newly confirmed Transporter order
+
+LOADING:
+
+- Amber or yellow accent
+- Loading or activity icon
+- Represents material currently being loaded
+
+DISPATCHED:
+
+- Teal or green accent
+- Truck or route icon
+- Represents an order dispatched from the Seller location
+
+Do not rely on color alone.
+
+Each status must include text and an icon or distinct badge shape.
+
+TRANSPORTER METRIC CARDS
+
+When By Transporter is active, replace the Buyer metrics with four Transporter-specific metric cards.
+
+The four metric cards must be:
+
+1. New
+
+Meaning:
+
+Count of Transporter orders currently having status `new`.
+
+Label:
+
+New
+
+Suggested supporting text:
+
+Awaiting loading activity
+
+2. Loading Now
+
+Meaning:
+
+Count of Transporter orders currently having status `loading`.
+
+Label:
+
+Loading Now
+
+Suggested supporting text:
+
+Material currently being loaded
+
+3. Total Requests
+
+Meaning:
+
+Total number of Transporter requests represented in the provided Transporter order list.
+
+Label:
+
+Total Requests
+
+Suggested supporting text:
+
+Transporter orders received
+
+4. Acceptance Rate
+
+Meaning:
+
+Percentage of total Transporter requests that were accepted and converted into an order.
+
+Label:
+
+Acceptance Rate
+
+Format:
+
+85%
+
+Suggested supporting text:
+
+Accepted Transporter requests
+
+ACCEPTANCE RATE RULE
+
+Calculate the acceptance rate only when the provided Transporter data contains enough information.
+
+Preferred calculation:
+
+accepted Transporter requests
+divided by
+total Transporter requests
+multiplied by 100
+
+If the future backend provides:
+
+{
+  totalRequests: 20,
+  acceptedRequests: 17,
+  acceptanceRate: 85
+}
+
+prefer the backend-provided `acceptanceRate`.
+
+If only accepted orders are supplied and total request information is unavailable, show:
+
+Not available
+
+Do not automatically display 100%.
+
+Do not fabricate a rate.
+
+Do not mix Buyer order statistics with Transporter statistics.
+
+Use the same current Metric component style where possible, but display Transporter-specific labels, icons, tones, and supporting text.
+
+TRANSPORTER VIEW TOOLBAR
+
+When By Transporter is active, show Transporter-specific controls.
+
+SEARCH FIELD
+
+Placeholder:
+
+Search request ID, delivery ID, Transporter, Seller, material, or location
+
+Search should match:
+
+- Transporter Request ID
+- Transporter Delivery ID
+- Transporter name
+- Transporter ID
+- Seller name
+- Seller ID
+- Material name
+- Pickup location
+- General location
+
+Search only the already-provided frontend data.
+
+Do not create a backend search request.
+
+STATUS FILTERS
+
+Show:
+
+- All
+- New
+- Loading
+- Dispatched
+
+Suggested internal values:
+
+- ALL
+- NEW
+- LOADING
+- DISPATCHED
+
+Each filter should show its real count based on `transporterOrders`.
+
+SORT OPTIONS
+
+Show:
+
+- Newest confirmed
+- Oldest confirmed
+- New first
+- Loading first
+- Dispatched first
+- Transporter name
+- Seller name
+
+Keep the Transporter sort state separate from the Buyer sort state.
+
+DATE FILTER
+
+You may reuse the current date filter for Transporter orders if it safely filters using `confirmedAt`.
+
+Options may remain:
+
+- Any date
+- Today
+- Last 7 days
+- Last 30 days
+- Last 3 months
+
+Do not modify Buyer date filtering.
+
+TRANSPORTER ORDER CARD
+
+Create a polished, premium Transporter order card.
+
+Every card must display:
+
+1. Transporter Request ID
+2. Transporter Delivery ID
+3. Current status
+4. Material name
+5. Material quantity
+6. Transporter name
+7. Seller name
+8. Location
+9. Confirmed date and time
+10. View Order button
+
+CARD HEADER
+
+The card header should show:
+
+Transporter Request ID:
+
+TR-260726-001
+
+Transporter Delivery ID:
+
+TD-260726-002
+
+The IDs should be displayed in a clean monospaced style.
+
+The primary ID should be:
+
+TR-260726-001
+
+The associated delivery ID should be:
+
+TD-260726-002
+
+Use clear labels or compact icon-assisted presentation so Admin can distinguish the two IDs.
+
+Do not display the IDs as one combined value.
+
+If one ID is unavailable, show:
+
+Request ID unavailable
+
+or:
+
+Delivery ID unavailable
+
+Do not invent missing IDs.
+
+STATUS BADGE
+
+Place the status badge in the card header.
+
+Supported badge text:
+
+- NEW
+- LOADING
+- DISPATCHED
+
+The badge should be compact, accessible, and visually distinctive.
+
+MATERIAL SECTION
+
+Display the material name and quantity prominently.
+
+For one material, show:
+
+20mm Crushed Stone
+20 ton
+
+For multiple materials, show each material as a separate compact row.
+
+Each material row should contain:
+
+- Material icon
+- Material name
+- Quantity
+- Quantity unit
+
+Do not show Buyer-facing commercial rates in the Transporter-order card unless explicitly provided and required later.
+
+The requested card content is operational, so focus on material and quantity.
+
+If quantity is unavailable, show:
+
+Quantity not provided
+
+If no material information is available, show:
+
+Material details unavailable
+
+TRANSPORTER INFORMATION
+
+Label:
+
+Transporter
+
+Display:
+
+- Transporter name
+- Transporter ID, when available
+
+Example:
+
+ABC Transport Agency
+T100001
+
+The Transporter name should have strong visual hierarchy.
+
+Do not display:
+
+Transporter name :
+
+with an empty value.
+
+Use:
+
+Transporter not available
+
+when missing.
+
+SELLER INFORMATION
+
+Label:
+
+Seller
+
+Display:
+
+- Seller name
+- Seller ID, when available
+
+Example:
+
+Stone Supplier
+S100001
+
+If Seller information is unavailable, show:
+
+Seller not assigned
+
+LOCATION
+
+Label:
+
+Location
+
+Display the Seller pickup or material source location.
+
+Use this priority:
+
+1. pickupLocation
+2. location
+3. sellerLocation
+4. sourceArea
+
+Show a location-pin icon.
+
+Long locations must wrap safely.
+
+Do not allow horizontal overflow.
+
+If no location is available, show:
+
+Location not provided
+
+CONFIRMED DATE AND TIME
+
+Label:
+
+Confirmed
+
+Display the full confirmed date and time using:
+
+- Indian date formatting
+- Indian time formatting
+- Asia/Kolkata timezone
+
+Example:
+
+26 Jul 2026, 10:30 AM
+
+You may also show a secondary relative time:
+
+Confirmed 20 min ago
+
+Do not show only the relative time.
+
+If `confirmedAt` is unavailable, show:
+
+Confirmation time not available
+
+VIEW ORDER BUTTON
+
+Add a prominent action button:
+
+View Order
+
+The button should:
+
+- Use the existing StoneRate orange action style
+- Include a right-arrow or document icon
+- Be easy to tap
+- Remain aligned across cards
+- Use full width on small mobile screens
+- Call:
+
+onViewTransporterOrder(order)
+
+Do not route to the existing Buyer Active Order Details page automatically.
+
+Do not create the Transporter Order Details page in this task.
+
+If the callback is not connected, use a safe no-op or development log without causing navigation to a blank page.
+
+CARD STRUCTURE
+
+Use a clean hierarchy similar to:
+
+Header:
+- Transporter Request ID
+- Transporter Delivery ID
+- Status badge
+
+Material section:
+- Material name
+- Quantity
+
+Party section:
+- Transporter name and ID
+- Seller name and ID
+
+Route section:
+- Location
+
+Footer:
+- Confirmed date and time
+- View Order button
+
+VISUAL DESIGN OF TRANSPORTER CARDS
+
+Focus heavily on a stunning and attractive design.
+
+Use:
+
+- Premium card surfaces
+- Soft shadows
+- Status-based side rail
+- Subtle background mesh consistent with existing Buyer cards
+- Polished IDs
+- Carefully aligned icons
+- Compact information blocks
+- Strong visual hierarchy
+- Elegant spacing
+- Smooth hover elevation on desktop
+- Subtle card entrance animation
+- Clear action button
+- Consistent card heights where practical
+
+Suggested status rails:
+
+- New: blue or orange
+- Loading: amber
+- Dispatched: teal or green
+
+Do not create a visually unrelated card style.
+
+The Transporter cards should clearly belong to the same Admin Active Orders page.
+
+OPTIONAL CARD ACCENTS
+
+You may include:
+
+- A small truck icon near the Transporter name
+- A building icon near the Seller name
+- A cube icon near material information
+- A location icon near pickup location
+- A calendar icon near confirmation timestamp
+
+Do not overload the card with too many decorative elements.
+
+LOADING STATE
+
+When:
+
+transporterOrdersLoading === true
+
+show polished Transporter order skeleton cards.
+
+The skeleton should approximate:
+
+- Two IDs
+- Status badge
+- Material row
+- Transporter details
+- Seller details
+- Location
+- Confirmation time
+- View Order button
+
+Do not display mock Transporter orders while loading.
+
+Do not replace the Buyer loading state.
+
+ERROR STATE
+
+When:
+
+transporterOrdersError
+
+show:
+
+Unable to load Transporter active orders
+
+Display:
+
+- The error message
+- Retry button
+- Option to switch back to By Buyer
+
+Retry must call:
+
+onRefreshTransporterOrders()
+
+Do not alter or overwrite the Buyer error state.
+
+EMPTY STATE
+
+When By Transporter is active and the loaded Transporter order list is empty, show:
+
+No Transporter active orders available
+
+Supporting text:
+
+Accepted Transporter requests will appear here after they are converted into active deliveries.
+
+Include:
+
+- Truck or delivery icon
+- Refresh button when available
+- Option to switch back to By Buyer
+
+Do not generate fake cards.
+
+FILTERED EMPTY STATE
+
+If Transporter orders exist but no record matches search or filters, show:
+
+No Transporter orders match the selected filters
+
+Include:
+
+- Clear search
+- Reset filters
+
+Do not use the full no-data state for filtered results.
+
+REFRESH BEHAVIOR
+
+The existing refresh button should behave according to the active source.
+
+When By Buyer is active:
+
+- Preserve the current Buyer refresh behavior
+- Continue calling the existing Buyer active-order loader
+
+When By Transporter is active:
+
+- Call:
+  onRefreshTransporterOrders()
+
+- Do not call the Buyer Active Orders API as the Transporter refresh action
+- Show the existing refresh animation
+- Preserve already-loaded cards while refreshing, when practical
+- Show an inline or toast success state after a successful refresh if the current page convention supports it
+
+Do not create a Transporter API in this task.
+
+OPTIONAL SOURCE COUNTS
+
+If data is available, show counts in the source switcher:
+
+By Buyer 12
+
+By Transporter 5
+
+Calculate Buyer count from the already-loaded Buyer orders.
+
+Calculate Transporter count only from `transporterOrders`.
+
+Do not invent counts.
+
+RESPONSIVE REQUIREMENTS
+
+The enhancement must work on mobile, tablet, laptop, and desktop.
+
+MOBILE
+
+On mobile:
+
+- The source switcher should span the available width
+- Both By Buyer and By Transporter options must remain easy to tap
+- Transporter metric cards should use two columns or one column based on width
+- Cards must use one column
+- IDs must wrap or truncate safely
+- Status must remain visible
+- Material and quantity must remain grouped
+- Transporter and Seller details must remain readable
+- Location must wrap naturally
+- Confirmed date and time may stack
+- View Order should use full width
+- Filter controls should scroll or wrap cleanly
+- No horizontal overflow is allowed
+
+TABLET
+
+On tablet:
+
+- Use one or two card columns depending on available width
+- Preserve comfortable spacing
+- Align card actions consistently
+
+DESKTOP
+
+On desktop:
+
+- Use two or three card columns where suitable
+- Do not stretch cards excessively
+- Keep card heights visually balanced
+- Preserve readable density
+- Keep metrics in one row
+- Align toolbar controls cleanly
+
+ACCESSIBILITY
+
+Include:
+
+- Semantic buttons
+- Accessible source tabs
+- `aria-selected` or `aria-pressed`
+- Keyboard navigation
+- Visible focus states
+- Accessible status labels
+- Status text in addition to color
+- Accessible loading states
+- Accessible error messages
+- Proper button labels
+- Reduced-motion support
+
+FRONTEND IMPLEMENTATION RULES
+
+1. Use React functional components and hooks.
+2. Update only the existing Admin Active Orders frontend page.
+3. Do not modify backend files.
+4. Do not modify database files.
+5. Do not create a new API endpoint.
+6. Do not change `getAdminActiveOrders()`.
+7. Do not change the Buyer Active Orders backend connection.
+8. Do not change Buyer order response mapping.
+9. Do not change Buyer order cards.
+10. Do not change Buyer order details navigation.
+11. Do not change Buyer status logic.
+12. Default the source filter to By Buyer.
+13. Keep Buyer and Transporter search state separate.
+14. Keep Buyer and Transporter filter state separate.
+15. Keep Buyer and Transporter sort state separate.
+16. Do not fabricate Transporter order data.
+17. Do not reuse Buyer orders as Transporter orders.
+18. Do not calculate a fake Acceptance Rate.
+19. Use callback-driven Transporter order data.
+20. Preserve all existing Admin bottom-navigation callbacks.
+21. Use the current `ao-` style prefix.
+22. Avoid unnecessary dependencies.
+23. Use the current icon implementation where possible.
+24. Format timestamps using Indian locale and Asia/Kolkata.
+25. Handle missing fields safely.
+26. Do not render undefined, null, NaN, or invalid dates.
+27. Return the complete updated page file, not partial snippets.
+
+RECOMMENDED RENDERING STRUCTURE
+
+The page should conceptually render:
+
+<ActiveOrdersHeader />
+
+<OrderSourceSwitcher
+  value={orderSource}
+  onChange={setOrderSource}
+/>
+
+{orderSource === "buyer" ? (
+  <>
+    <ExistingBuyerMetrics />
+    <ExistingBuyerToolbar />
+    <ExistingBuyerOrders />
+  </>
+) : (
+  <>
+    <TransporterMetrics />
+    <TransporterOrdersToolbar />
+    <TransporterOrdersList />
+  </>
+)}
+
+<ExistingAdminBottomNavigation />
+
+Do not unnecessarily move the current Buyer Active Orders code into a new file if that introduces regression risk.
+
+The safest approach is:
+
+- Keep all current Buyer logic intact
+- Wrap the current Buyer metric, toolbar, and list rendering under:
+  orderSource === "buyer"
+- Add the Transporter section alongside it under:
+  orderSource === "transporter"
+
+EXPECTED FUTURE CALLBACK
+
+The Transporter card should call:
+
+onViewTransporterOrder(order)
+
+Do not implement navigation to a details page yet.
+
+Do not route Transporter orders through:
+
+onOpenOrder(order)
+
+unless the parent explicitly passes the same handler for both order types later.
+
+FINAL OUTPUT REQUIREMENTS
+
+Return:
+
+1. The complete updated existing Admin Active Orders page file
+2. A concise list of frontend additions
+3. The new optional Transporter props
+4. The expected Transporter order data structure
+5. A clear statement that the Buyer Active Orders backend connection was not touched
+6. A clear statement that no backend or database changes were made
+7. A clear statement that the existing Buyer Active Orders cards and workflow remain preserved
+
+Do not return:
+
+- Backend routes
+- API helper changes
+- Database migrations
+- App.js changes
+- Transporter Order Details page
+- Mock API services
+- Fake production Transporter orders
+
+The final result must be stunning, attractive, modern, premium, responsive, polished, and fully consistent with the current Admin Active Orders page.
