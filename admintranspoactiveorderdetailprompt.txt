@@ -1,0 +1,1077 @@
+Create a complete, production-quality React page for the StoneRate Admin interface named:
+
+StoneRateAdminTransporterActiveOrderDetails.js
+
+PURPOSE
+
+This page allows the StoneRate Admin to view and manage an active delivery order created from an accepted Transporter material request.
+
+The page must allow the Admin to:
+
+- View the Transporter Request ID
+- View the Transporter Delivery ID
+- View the current order status
+- Review Transporter information
+- Review the requested material and quantity
+- Open the permanent material reference
+- Review Seller and pickup information
+- Call the Transporter
+- Call the Seller
+- Navigate to the Seller’s location
+- Review all assigned vehicle numbers
+- Update the operational status of one or more vehicles
+- Select the materials being carried by each vehicle
+- Record loading, loaded, and dispatched statuses
+- Enter actual loaded quantity when required
+- Review the complete order and vehicle activity log
+
+FILE TO CREATE
+
+Create the complete frontend page:
+
+src/pages/StoneRateAdminTransporterActiveOrderDetails.js
+
+IMPORTANT DESIGN REFERENCE
+
+Use the existing page:
+
+src/pages/AdminActiveOrderDetails.js
+
+as the primary visual and interaction reference.
+
+The new page must take its theme from the existing Admin Active Order Details page, including:
+
+- Header treatment
+- StoneRate Admin branding
+- Typography
+- Color palette
+- White and light-grey canvas
+- StoneRate orange accents
+- Card styling
+- Information hierarchy
+- Status colors
+- Form controls
+- Buttons
+- Modal treatment
+- Shadows
+- Border radius
+- Spacing
+- Loading skeletons
+- Error states
+- Responsive behavior
+- Bottom navigation, if present
+- Mobile interaction patterns
+
+Do not create an unrelated theme.
+
+The page should clearly belong to the same Admin order-management system.
+
+PRIMARY DESIGN REQUIREMENT
+
+Focus strongly on making the page:
+
+- Stunning
+- Attractive
+- Premium
+- Modern
+- Polished
+- Operationally clear
+- Production-ready
+- Responsive
+- Easy to scan
+- Easy to manage on mobile and desktop
+
+Use premium visual details such as:
+
+- Subtle gradients
+- Status-based side rails
+- Layered information cards
+- Soft shadows
+- Clear icons
+- Compact information chips
+- Smooth but restrained transitions
+- Carefully aligned IDs
+- Strong status presentation
+- Elegant operational timeline
+- Attractive vehicle status controls
+
+Do not make the interface overly decorative or difficult to operate.
+
+SCOPE
+
+Build the complete frontend page and its callback-driven interactions.
+
+Do not implement or modify backend code in this task.
+
+Do not modify:
+
+- Buyer Active Orders backend
+- Buyer Active Order Details page
+- Buyer order APIs
+- Existing Buyer delivery workflow
+- Transporter request backend
+- Transporter order list backend
+- Database tables
+- Existing Admin navigation
+- Existing Active Orders page
+
+Do not fabricate production order records.
+
+PAGE COMPONENT PROPS
+
+The page should accept:
+
+{
+  selectedOrder = null,
+  loading = false,
+  error = "",
+  saving = false,
+
+  onBack = () => {},
+  onRefresh = () => {},
+  onRetry = () => {},
+
+  onUpdateVehicleStatus = async () => {},
+
+  onCallTransporter = () => {},
+  onCallSeller = () => {},
+  onNavigateSeller = () => {},
+
+  onHome = () => {},
+  onSamples = () => {},
+  onTransporterBidding = () => {},
+  onRateRequests = () => {},
+  onConfirmedOrders = () => {}
+}
+
+EXPECTED ORDER DATA
+
+Support an order object such as:
+
+{
+  id: "TD-260726-002",
+  transporterRequestId: "TR-260726-001",
+  transporterDeliveryId: "TD-260726-002",
+
+  status: "new",
+
+  confirmedAt: "2026-07-26T10:30:00.000Z",
+  loadingStartedAt: null,
+  loadedAt: null,
+  dispatchedAt: null,
+  updatedAt: "2026-07-26T10:30:00.000Z",
+
+  transporter: {
+    id: "T100001",
+    name: "ABC Transport Agency",
+    agencyName: "ABC Transport Agency",
+    ownerName: "Registered Transporter",
+    phone: "9876543210",
+    location: "Varanasi, Uttar Pradesh",
+    city: "Varanasi",
+    state: "Uttar Pradesh",
+    joinedAt: "2026-06-15T10:30:00.000Z"
+  },
+
+  seller: {
+    id: "S100000",
+    name: "Registered Seller",
+    plantName: "Stone Supplier",
+    phone: "7348145995",
+
+    location: "Sonbhadra, Uttar Pradesh",
+    address: "Registered Seller pickup address",
+    city: "Sonbhadra",
+    state: "Uttar Pradesh",
+    pincode: "166484",
+
+    latitude: 24.6869,
+    longitude: 83.0684,
+
+    joinedAt: "2026-05-20T09:30:00.000Z"
+  },
+
+  materials: [
+    {
+      id: "material-1",
+      name: "20mm Crushed Stone",
+      materialName: "20mm Crushed Stone",
+
+      requestedQuantity: 20,
+      requestedQuantityUnit: "ton",
+
+      sampleId: "sample-1790186678980-b16yakch",
+      sampleCode: "2CS-MUEEXDXG-0B5",
+
+      imageUrl: "https://example.com/material-image.jpg",
+      thumbnailUrl: "https://example.com/material-thumbnail.jpg",
+
+      materialType: "STONE",
+
+      rate: 1277,
+      rateUnit: "ton",
+
+      feetPerTon: 45,
+      convertedRate: 28.38,
+      convertedRateUnit: "feet",
+
+      permitCost: 850,
+
+      availableQuantity: 80,
+      availableQuantityUnit: "ton",
+
+      sampleUploadedAt: "2026-07-26T06:00:00.000Z",
+      sampleExpiresAt: "2026-07-27T23:43:38.000Z"
+    }
+  ],
+
+  vehicles: [
+    {
+      id: "vehicle-1",
+      slotNumber: 1,
+      vehicleNumber: "KA-03-AB-3828",
+
+      status: "loading",
+
+      materialIds: ["material-1"],
+
+      expectedQuantity: 10,
+      loadedQuantity: null,
+      quantityUnit: "ton",
+
+      loadingStartedAt: "2026-07-26T12:00:00.000Z",
+      loadedAt: null,
+      dispatchedAt: null,
+      updatedAt: "2026-07-26T12:00:00.000Z"
+    },
+
+    {
+      id: "vehicle-2",
+      slotNumber: 2,
+      vehicleNumber: "",
+
+      status: "new",
+
+      materialIds: [],
+
+      expectedQuantity: 10,
+      loadedQuantity: null,
+      quantityUnit: "ton",
+
+      loadingStartedAt: null,
+      loadedAt: null,
+      dispatchedAt: null,
+      updatedAt: null
+    }
+  ],
+
+  activityLog: [
+    {
+      id: "log-1",
+      type: "confirmed",
+      title: "Order confirmed",
+      vehicleNumber: null,
+      materialName: "20mm Crushed Stone",
+      quantity: 20,
+      quantityUnit: "ton",
+      createdAt: "2026-07-26T10:30:00.000Z"
+    },
+
+    {
+      id: "log-2",
+      type: "loading_started",
+      title: "Vehicle loading started",
+      vehicleNumber: "KA-03-AB-3828",
+      materialName: "20mm Crushed Stone",
+      quantity: null,
+      quantityUnit: "ton",
+      createdAt: "2026-07-26T12:00:00.000Z"
+    }
+  ]
+}
+
+Do not hardcode this example into the rendered page.
+
+Use it only as the supported frontend structure.
+
+ORDER STATUS SUPPORT
+
+Support these overall order statuses:
+
+- new
+- loading
+- loaded
+- dispatched
+
+Display them as:
+
+- NEW
+- LOADING
+- LOADED
+- DISPATCHED
+
+If the backend later provides:
+
+- in_transit
+
+it may be displayed as:
+
+DISPATCHED
+
+unless the existing project has a separate In Transit status.
+
+Do not change the backend value in frontend state before backend confirmation.
+
+STATUS VISUALS
+
+NEW:
+
+- Blue or StoneRate-orange accent
+- Represents a newly confirmed delivery
+- Indicates that vehicle loading has not started
+
+LOADING:
+
+- Amber accent
+- Represents at least one vehicle currently loading
+
+LOADED:
+
+- Purple, blue, or green accent
+- Represents a vehicle or order that has completed loading
+
+DISPATCHED:
+
+- Teal or green accent
+- Represents a vehicle that has left the Seller location
+
+Use text and icons in addition to color.
+
+PAGE HEADER
+
+Create a header consistent with AdminActiveOrderDetails.js.
+
+The header must include:
+
+1. Back button
+2. StoneRate Admin branding
+3. Page title:
+   Transporter Active Order
+4. Refresh button
+5. Current order status badge
+6. Supporting text:
+   Manage vehicle loading, material allocation, and dispatch activity
+
+TOP IDENTITY SECTION
+
+At the top of the page, create a premium order-identity card.
+
+Display both IDs prominently:
+
+Transporter Request ID:
+
+TR-260726-001
+
+Transporter Delivery ID:
+
+TD-260726-002
+
+Place the current order status on the right-hand side.
+
+Suggested desktop structure:
+
+TR-260726-001       TD-260726-002       [LOADING]
+
+Suggested mobile structure:
+
+Transporter Request
+TR-260726-001
+
+Transporter Delivery
+TD-260726-002
+
+[LOADING]
+
+The IDs should use a clean monospaced style.
+
+Do not merge the IDs into one value.
+
+If either identifier is missing, show:
+
+Request ID unavailable
+
+or:
+
+Delivery ID unavailable
+
+Do not invent an identifier.
+
+Also show:
+
+- Confirmed date and time
+- Last updated date and time
+- Total materials
+- Total assigned vehicles
+- Current operational stage
+
+TRANSPORTER SECTION
+
+Create a dedicated Transporter information card below the order identity section.
+
+Display:
+
+- Transporter agency name
+- Transporter ID
+- Owner name, when available
+- Registered location
+- Mobile number
+- Joining date
+
+The Transporter name and Transporter ID must be clickable.
+
+Use a truck or Transporter icon.
+
+Include a Call Transporter button.
+
+The call button should call:
+
+onCallTransporter(
+  selectedOrder.transporter.phone,
+  selectedOrder.transporter
+)
+
+If no phone number is available:
+
+- Disable the Call button
+- Show:
+  Transporter phone number not available
+- Do not generate a phone number
+
+TRANSPORTER DETAILS POPUP
+
+When the Admin clicks the Transporter name or Transporter ID, open a polished modal.
+
+Modal title:
+
+Transporter Details
+
+Display:
+
+- Transporter agency name
+- Transporter ID
+- Owner name
+- Mobile number
+- Registered location
+- City
+- State
+- Joining date
+- Current Transporter Request ID
+- Current Transporter Delivery ID
+- Assigned vehicle count
+- Current order status
+- Call Transporter button
+- Copy Transporter ID button
+- Close button
+
+The Call button should call:
+
+onCallTransporter(phone, transporter)
+
+The copy action should copy the Transporter ID and show:
+
+Transporter ID copied
+
+Do not expose:
+
+- Aadhaar information
+- Authentication records
+- OTP values
+- Verification documents
+- Internal passwords or tokens
+
+MATERIAL SUMMARY SECTION
+
+Below the Transporter section, display every material included in the order.
+
+For each material, show:
+
+- Small square material reference image
+- Material name
+- Requested quantity
+- Quantity unit
+- Material rate
+- Permit cost
+- Sample code
+- Seller source
+- Available quantity, when provided
+
+The small reference image should be square.
+
+Suggested image size:
+
+- Mobile: approximately 72 × 72 pixels
+- Desktop: approximately 90 × 90 pixels
+
+The image should use:
+
+- Rounded corners
+- Proper loading state
+- Broken-image fallback
+- Reference badge or image-view affordance
+- Accessible alternative text
+
+Example material presentation:
+
+[Square image]
+
+20mm Crushed Stone
+20 ton
+
+Material rate: ₹1,277 / ton
+Permit cost: ₹850
+
+If multiple materials exist, show a separate material row or card for each one.
+
+Do not combine unrelated material quantities.
+
+MATERIAL REFERENCE IMAGE INTERACTION
+
+When the Admin clicks the square image, open a detailed Reference Source modal.
+
+Use the supplied screenshot as the structural reference.
+
+The screenshot contains:
+
+- Reference Source title
+- Sample code below the title
+- Close button
+- Large material image
+- Uploaded-by information
+- Seller ID
+- Material type
+- Source sample ID
+- Location
+- Mobile number
+- Uploaded time
+- Recorded rate
+- Converter rate
+- Converted material rate
+- Sample expiry
+- Permit cost
+- Available quantity
+- Copy button
+- Call Seller button
+- Internal-information notice
+
+Reproduce this information hierarchy while matching the visual theme of AdminActiveOrderDetails.js.
+
+REFERENCE SOURCE MODAL
+
+Modal title:
+
+Reference Source
+
+Display:
+
+1. Sample or reference code
+2. Large reference image
+3. Uploaded by
+4. Seller name
+5. Seller ID
+6. Material type
+7. Source sample ID
+8. Seller or pickup location
+9. Mobile number
+10. Sample uploaded date and time
+11. Recorded material rate
+12. Converter rate
+13. Converted material rate
+14. Sample expiry date and time
+15. Permit cost
+16. Available quantity
+17. Copy Information button
+18. Call Seller button
+19. Close button
+
+LARGE REFERENCE IMAGE
+
+The large image should:
+
+- Preserve the complete source image
+- Use `object-fit: contain`
+- Avoid forced cropping
+- Support image loading state
+- Support broken-image fallback
+- Include accessible alternative text
+- Allow a larger full-screen preview when clicked
+
+COPY INFORMATION BUTTON
+
+The Copy button should copy:
+
+- Transporter Request ID
+- Transporter Delivery ID
+- Material name
+- Requested quantity
+- Sample code
+- Seller name
+- Seller ID
+- Seller location
+- Mobile number
+- Recorded material rate
+- Converter rate
+- Converted material rate
+- Permit cost
+- Available quantity
+- Sample expiry
+
+Show:
+
+Reference information copied
+
+when successful.
+
+CALL SELLER BUTTON
+
+The Call Seller button should call:
+
+onCallSeller(
+  selectedOrder.seller.phone,
+  selectedOrder.seller
+)
+
+Disable the button if the phone number is missing.
+
+At the bottom of the modal, include:
+
+Seller information is internal and will not be shown outside StoneRate’s operational workflow.
+
+SELLER INFORMATION SECTION
+
+Create a dedicated Seller information card.
+
+Display:
+
+- Seller name
+- Seller ID, when available
+- Plant or business name, when available
+- Pickup location
+- Full address, when available
+- Mobile number
+- Material supplied
+- Sample code
+
+The primary content should be:
+
+Name:
+Registered Seller
+
+Location:
+Sonbhadra, Uttar Pradesh
+
+Include two prominent buttons:
+
+1. Navigate
+2. Call Seller
+
+NAVIGATE BUTTON
+
+The Navigate button should call:
+
+onNavigateSeller({
+  seller: selectedOrder.seller,
+  order: selectedOrder,
+  destination: {
+    sellerName,
+    sellerId,
+    address,
+    location,
+    city,
+    state,
+    pincode,
+    latitude,
+    longitude,
+    transporterRequestId,
+    transporterDeliveryId
+  }
+})
+
+If latitude and longitude are available, pass them.
+
+If only an address exists, pass the address.
+
+Do not invent coordinates.
+
+Disable Navigate only when no usable address, location, or coordinates exist.
+
+CALL SELLER BUTTON
+
+The Call Seller button should call:
+
+onCallSeller(
+  selectedOrder.seller.phone,
+  selectedOrder.seller
+)
+
+Disable the button if the Seller phone number is unavailable.
+
+VEHICLE DETAILS SECTION
+
+Create a major section titled:
+
+Vehicle Details
+
+Supporting text:
+
+Review assigned vehicles and update each vehicle’s loading and dispatch status.
+
+Display all required vehicle slots.
+
+Example:
+
+Vehicle No. 1
+KA-03-AB-3828
+
+Vehicle No. 2
+Vehicle number not assigned
+
+Each vehicle card should show:
+
+- Vehicle slot number
+- Vehicle number
+- Current vehicle status
+- Assigned material or materials
+- Expected quantity
+- Loaded quantity, when available
+- Loading start time
+- Loaded time
+- Dispatched time
+- Last updated time
+
+VEHICLE NUMBER FORMAT
+
+Display vehicle numbers in uppercase.
+
+Example:
+
+KA-03-AB-3828
+
+Do not alter the stored vehicle number unnecessarily.
+
+If no vehicle number is assigned, show:
+
+Vehicle number not assigned
+
+Do not create a placeholder vehicle number.
+
+VEHICLE STATUS BADGES
+
+Support:
+
+- NEW
+- LOADING
+- LOADED
+- DISPATCHED
+
+Status colors should match the overall operational status theme.
+
+NEW:
+
+- Blue or orange
+
+LOADING:
+
+- Amber
+
+LOADED:
+
+- Purple, blue, or green
+
+DISPATCHED:
+
+- Teal or green
+
+VEHICLE STATUS MANAGEMENT CARD
+
+Below the vehicle list, create a major management card titled:
+
+Update Vehicle Status
+
+Supporting text:
+
+Select one or more vehicles, choose the assigned material, and record the latest operational status.
+
+This card should contain a structured Admin form.
+
+FORM SECTION 1: SELECT VEHICLES
+
+Allow Admin to select one or more vehicle numbers.
+
+Use selectable vehicle cards, checkboxes, or a polished multi-select.
+
+Each option should display:
+
+- Vehicle slot number
+- Vehicle number
+- Current status
+- Current assigned material
+- Current loaded quantity, when available
+
+Example:
+
+☑ Vehicle 1
+KA-03-AB-3828
+Current status: Loading
+
+☐ Vehicle 2
+Vehicle number not assigned
+Current status: New
+
+Do not allow a vehicle without a vehicle number to be updated to Loading, Loaded, or Dispatched.
+
+Show:
+
+Assign a vehicle number before updating this vehicle.
+
+FORM SECTION 2: SELECT MATERIALS
+
+Allow Admin to select one or more materials carried by the selected vehicles.
+
+Display:
+
+- Material name
+- Requested quantity
+- Quantity unit
+- Quantity already allocated to other vehicles, if provided
+- Remaining allocatable quantity, if provided
+
+If only one material exists, preselect the material but still show it clearly.
+
+Do not allow a vehicle to be assigned to a nonexistent material.
+
+Do not allow duplicate material IDs in the payload.
+
+FORM SECTION 3: STATUS
+
+Add a dropdown labeled:
+
+Vehicle Status
+
+The dropdown must contain:
+
+- Loading
+- Loaded
+- Dispatched
+
+Suggested internal values:
+
+- loading
+- loaded
+- dispatched
+
+Do not include New as an update option unless the existing backend explicitly supports resetting a vehicle.
+
+STATUS RULES
+
+LOADING:
+
+- Records that loading has started
+- Loaded quantity is not mandatory
+- May display optional Admin note
+
+LOADED:
+
+- Requires loaded quantity
+- Records the loaded timestamp
+- The loaded quantity must be greater than zero
+
+DISPATCHED:
+
+- Requires loaded quantity
+- Confirms material has been loaded
+- Records the dispatch timestamp
+- Should not dispatch a vehicle without a valid vehicle number
+
+LOADED QUANTITY FIELD
+
+If Admin selects:
+
+- Loaded
+- Dispatched
+
+show an additional field:
+
+Loaded Quantity
+
+Also show the relevant unit:
+
+- ton
+- feet
+- bucket
+- or the backend-provided unit
+
+Example:
+
+Loaded Quantity
+10 ton
+
+This field must:
+
+- Accept numeric values
+- Support required decimal precision
+- Reject zero
+- Reject negative values
+- Reject invalid text
+- Show the quantity unit
+- Provide clear validation
+- Preserve entered data if submission fails
+
+For Loading status, hide the loaded-quantity field unless the existing backend supports a partial quantity.
+
+EXPECTED QUANTITY INFORMATION
+
+When loaded quantity is required, show:
+
+Expected quantity:
+10 ton
+
+Previously recorded loaded quantity:
+Not recorded
+
+This helps Admin avoid mistakes.
+
+OPTIONAL ADMIN NOTE
+
+Include an optional field:
+
+Admin Note
+
+Placeholder:
+
+Add operational notes about loading or dispatch
+
+Limit:
+
+500 characters
+
+Provide a character counter.
+
+Do not require the note unless the backend later mandates it.
+
+STATUS UPDATE SUMMARY
+
+Before the Save button, show a compact summary:
+
+Selected vehicles:
+KA-03-AB-3828
+
+Selected materials:
+20mm Crushed Stone
+
+New status:
+Loaded
+
+Loaded quantity:
+10 ton
+
+This summary should update immediately as the form changes.
+
+SAVE STATUS ACTION
+
+Primary button:
+
+Save Vehicle Status
+
+On submission, call:
+
+onUpdateVehicleStatus({
+  transporterRequestId:
+    selectedOrder.transporterRequestId,
+
+  transporterDeliveryId:
+    selectedOrder.transporterDeliveryId,
+
+  vehicleIds:
+    selectedVehicleIds,
+
+  vehicleNumbers:
+    selectedVehicleNumbers,
+
+  materialIds:
+    selectedMaterialIds,
+
+  status:
+    selectedStatus,
+
+  loadedQuantity:
+    selectedStatus === "loaded" ||
+    selectedStatus === "dispatched"
+      ? loadedQuantity
+      : null,
+
+  quantityUnit:
+    selectedQuantityUnit,
+
+  adminNote
+})
+
+If the parent callback expects one update per vehicle, the page may call it separately for each selected vehicle, but it must:
+
+- Prevent partial silent failures
+- Report which vehicle failed
+- Refresh backend data after completion
+- Avoid updating only local state
+
+VALIDATION
+
+Before submission, validate:
+
+- At least one vehicle is selected
+- Every selected vehicle has a valid vehicle number
+- At least one material is selected
+- A valid status is selected
+- Loaded quantity exists for Loaded
+- Loaded quantity exists for Dispatched
+- Loaded quantity is greater than zero
+- Quantity unit is available
+- The order is not already completed or cancelled
+- Another request is not already saving
+
+Do not trust frontend validation alone.
+
+The backend must validate the update again.
+
+SUBMISSION BEHAVIOR
+
+During submission:
+
+- Disable the form
+- Disable duplicate clicks
+- Show a spinner
+- Keep entered values visible
+- Do not reset the form
+- Do not close the card
+- Do not update the permanent status before backend confirmation
+
+After success:
+
+- Show:
+  Vehicle status updated successfully
+- Refresh order details
+- Update vehicle cards using the backend response
+- Update the overall order status
+- Add the new entry to the activity log
+- Clear the selected vehicles
+- Clear the selected materials
+- Reset the status dropdown
+- Clear loaded quantity
+- Clear Admin note
+
+After failure:
+
+- Keep the entered values
+- Show the backend error
+- Re-enable the form
+- Do not create a fake activity-log entry
+
+OPERATIONAL
