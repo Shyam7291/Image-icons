@@ -1,0 +1,1367 @@
+STONERATE PROJECT HANDOFF
+Current status: Sand Seller frontend completed, Sand Seller backend integration in progress
+Handoff date: 15 September 2026
+
+======================================================================
+1. PURPOSE OF THIS DOCUMENT
+======================================================================
+
+This document contains the complete working context of the StoneRate project so development can continue in a new chat without re-explaining the project.
+
+Important instruction for the next chat:
+
+- Read this entire document before suggesting or changing code.
+- Always use the latest uploaded/deployed file as the base.
+- Do not rebuild large files from older chat versions.
+- Preserve all relevant existing routes, APIs, database tables, UI features, and integrations.
+- Updated frontend and backend code must be provided as complete downloadable .txt files.
+- Make only targeted changes, especially in large files such as orders.routes.js, admin.routes.js, initDatabase.js, and App.js.
+- Run JavaScript syntax checks, JSX build checks, SQL placeholder/count checks, and cross-file consistency checks before returning files.
+
+======================================================================
+2. PROJECT OVERVIEW
+======================================================================
+
+Project name: StoneRate
+
+StoneRate is a marketplace and operational platform for construction materials. It currently supports:
+
+1. Buyers
+2. Stone Sellers
+3. Sand Sellers
+4. Admin
+5. Transport-related workflows
+
+The application allows Sellers to upload material samples, Buyers to compare samples and raise rate requests, Admin to prepare quotations and control platform information, and Sellers to manage orders and operational queues.
+
+The project uses one shared application, shared database, and shared authentication system, but Stone Seller and Sand Seller operational modules are separated where their business rules differ.
+
+======================================================================
+3. REPOSITORIES AND DEPLOYMENT
+======================================================================
+
+Frontend GitHub repository:
+Shyam7291/my-app-frontend
+
+Backend GitHub repository:
+Shyam7291/my-app-backend
+
+Hosting:
+Render
+
+Render project contains two services:
+
+- My App Frontend
+- My App Backend
+
+Backend URL currently used by frontend APIs:
+https://my-app-backend-4d34.onrender.com
+
+Images:
+Cloudflare R2
+
+Image workflow:
+
+1. Frontend submits an image through multipart/form-data.
+2. Backend validates the image using Multer and Sharp.
+3. Backend uploads the image to Cloudflare R2.
+4. The permanent R2 URL is saved in PostgreSQL.
+5. The same saved URL is reused in Seller, Buyer, Admin, quotation, and order views.
+
+Stone and Sand images use the same R2 infrastructure but separate object prefixes.
+
+Examples:
+
+- Stone samples: existing Stone sample folder/path
+- Sand samples: sand-seller-samples/<sellerPublicId>/...
+- Seller profiles: existing profile-image folder/path
+
+Do not create another R2 bucket or another R2 utility unless strictly necessary.
+
+======================================================================
+4. IMPORTANT DEVELOPMENT PREFERENCES
+======================================================================
+
+- Communication should be in English.
+- When code files are updated, provide the complete file, not partial patches.
+- Every downloadable code file should be in .txt format.
+- Always preserve existing relevant functionality.
+- Do not remove routes, exports, styles, tables, or workflows unrelated to the requested change.
+- For large files, compare the updated version against the latest uploaded version and confirm that unrelated code was preserved.
+- Never assume old generated files are still the latest deployed files.
+- Ask for the current file when there is uncertainty.
+
+======================================================================
+5. HIGH-LEVEL FRONTEND STRUCTURE
+======================================================================
+
+Main frontend area:
+src/
+
+Main entry files:
+
+- src/App.js
+- src/index.js
+- src/style.css
+
+Important existing API files include:
+
+- src/api/adminApi.js
+- src/api/authApi.js
+- src/api/orderApi.js
+- src/api/profileApi.js
+- src/api/sellerHomeApi.js
+- src/api/sellerInformationApi.js
+- src/api/sellerSalesReportApi.js
+- src/api/sellerSamplesApi.js
+- src/api/sellerNotificationsApi.js
+- src/api/sandSellerSamplesApi.js
+- src/api/sandSellerOperationsApi.js
+- src/api/sandSellerNotificationsApi.js
+
+Important Buyer pages include:
+
+- src/pages/Page5.js: combined Stone/Sand sample catalogue and material selection
+- src/pages/Page6.js: Buyer request confirmation
+- src/pages/Page7.js: Buyer rate request details and quotation-ready stage
+- src/pages/Page8.js: Buyer active order details
+- src/pages/Page9.js: Buyer order list/history cards
+
+Important Stone Seller pages include:
+
+- SellerHomePage.js
+- SellerInformationPage.js
+- SellerMySamplesPage.js
+- SellerSamplesPage.js
+- SellerOrdersPage.js
+- SellerSalesReportPage.js
+- SellerProfilePage.js
+- SellerTransporterContactsPage.js
+- SellerGuidePage.js
+- SellerTermsPrivacyPage.js
+
+Important Admin pages include:
+
+- AdminDashboard.js
+- AdminRateRequests.js
+- AdminRateRequestDetails.js
+- AdminActiveOrders.js
+- AdminActiveOrderDetails.js
+- AdminSamples.js
+- AdminSettings.js
+
+Important Sand Seller pages include:
+
+- StoneRateSandSellerHome.js
+- StoneRateSellerQueuePage.js
+- SandSellerSamplePage.js
+- SandSellerMySamplePage.js
+- SandSellerProfilePage.js
+- SandSellerAboutStoneRate.js
+- SandSellerHowStoneRateWorks.js
+- SandSellerTermsAndConditions.js
+
+======================================================================
+6. BACKEND STRUCTURE
+======================================================================
+
+Backend root:
+
+- package.json
+- README.md
+- .gitignore
+
+Backend src files:
+
+- src/db.js
+- src/initDatabase.js
+- src/r2Storage.js
+- src/server.js
+
+Existing route files include:
+
+- src/routes/admin.routes.js
+- src/routes/auth.routes.js
+- src/routes/buyers.routes.js
+- src/routes/orders.routes.js
+- src/routes/sellerInformation.routes.js
+- src/routes/sellerMarketData.routes.js
+- src/routes/sellerSalesReport.routes.js
+- src/routes/sellerSamples.routes.js
+- src/routes/sellerTransportContacts.routes.js
+- src/routes/sellers.routes.js
+- src/routes/sellerNotifications.routes.js
+- src/routes/sandSellerSamples.routes.js
+- src/routes/sandSellerOperations.routes.js
+- src/routes/sandSellerNotifications.routes.js
+
+Separate database initializer files currently used/planned:
+
+- src/database/initializeSandSellerSamples.js
+- src/database/initializeSandSellerOperations.js
+- src/database/initializeSandSellerNotifications.js
+
+The server already mounts the relevant shared and Sand-specific routers.
+
+======================================================================
+7. SHARED AUTHENTICATION AND SELLER TYPES
+======================================================================
+
+Authentication is shared. Do not create a separate Sand Seller login system.
+
+Seller type is identified using:
+
+sellerProductType: "stones" or "sand"
+
+The backend/database field is:
+
+seller_product_type
+
+Existing Sellers default to:
+
+stones
+
+Sand Seller registration uses the shared Seller registration and OTP process.
+
+Sand Seller registration fields include:
+
+- Name
+- Plant name
+- Mobile number
+- GSTIN
+- Aadhaar number
+- Sand material
+- Full address
+- City
+- State
+- PIN code
+
+Stone Seller registration retains Stone-specific fields such as categories and daily production.
+
+Important rule:
+
+- Sand Sellers must not be required to provide Stone categories or Stone daily production.
+- Stone Sellers must not be required to provide Sand GSTIN/material fields unless otherwise intended.
+
+Normal sign-in must return sellerProductType so App.js routes correctly:
+
+- stones -> Stone Seller Home
+- sand -> Sand Seller Home
+
+The combined App.js opens the main app welcome screen first, then supports Create Account and Sign In.
+
+======================================================================
+8. ADMIN MATERIAL CATALOGUES
+======================================================================
+
+Stone/common materials and Sand materials are controlled separately.
+
+Stone/common catalogue table:
+
+platform_materials
+
+Sand catalogue table:
+
+sand_material_catalogue
+
+Admin Settings contains two separate cards under Common Settings:
+
+1. Material catalogue
+2. Sand material catalogue
+
+Stone/common endpoints:
+
+- GET /api/seller-information/materials
+- POST /api/seller-information/materials
+- PATCH /api/seller-information/materials/:id
+- DELETE /api/seller-information/materials/:id
+
+Sand material endpoints:
+
+- GET /api/seller-information/sand-materials
+- POST /api/seller-information/sand-materials
+- PATCH /api/seller-information/sand-materials/:id
+- DELETE /api/seller-information/sand-materials/:id
+
+The Sand catalogue starts with Morang and can later include River Sand, M-Sand, P-Sand, or additional Admin-approved materials.
+
+Soft disabling is preferred over permanent deletion so historical samples and orders remain valid.
+
+======================================================================
+9. STONE SELLER SAMPLE WORKFLOW
+======================================================================
+
+Stone Seller samples use the existing Stone-specific route/table/API.
+
+Important rules:
+
+- Units: ton or feet
+- Sample validity: 24 hours
+- Permit cost is supported for both ton and feet uploads
+- Permanent R2 image URL is reused across the application
+- Rate can follow existing Stone update rules
+- Buyer sees material rate in feet
+- Admin Ton/Feet Calculator supplies location/material conversion when Seller uploads in tons
+
+Stone Seller sample files remain separate from Sand files:
+
+- frontend/src/api/sellerSamplesApi.js
+- backend/src/routes/sellerSamples.routes.js
+
+Do not merge Sand bucket-specific rules into Stone tables unless explicitly designed.
+
+======================================================================
+10. SAND SELLER SAMPLE WORKFLOW
+======================================================================
+
+Sand Seller samples use separate modules.
+
+Frontend API:
+
+src/api/sandSellerSamplesApi.js
+
+Backend route:
+
+src/routes/sandSellerSamples.routes.js
+
+Database initializer:
+
+src/database/initializeSandSellerSamples.js
+
+Main Sand sample table:
+
+sand_seller_samples
+
+Important rules:
+
+- Unit: bucket
+- Rate: per bucket
+- Permit: per bucket
+- Available quantity: buckets
+- Sample validity: 5 days / 120 hours
+- JPG, PNG, WEBP
+- Maximum image upload: 15 MB
+- Images stored in Cloudflare R2
+- Only verified Sand Sellers can use the route
+- Material must be active in sand_material_catalogue
+- Bucket information must be configured for that Seller/material
+- Rate can be updated once every 24 hours
+- Permit rate can be updated once every 24 hours
+- Rate and permit have independent cooldowns
+- Quantity can be updated separately
+- Sample ownership is checked on every update/delete
+
+Important R2 metadata fix:
+
+Material metadata must be encoded before sending in the HTTP header:
+
+encodeURIComponent(approvedMaterialName)
+
+This prevents ERR_INVALID_CHAR in x-amz-meta-material.
+
+Sand Seller market samples can include the signed-in Seller's own sample, along with other eligible samples.
+
+======================================================================
+11. SAND SELLER BUCKET INFORMATION
+======================================================================
+
+Bucket conversion is configured per Seller and per Admin-approved Sand material.
+
+Database table:
+
+seller_sand_bucket_information
+
+Important: the correct table name is exactly:
+
+seller_sand_bucket_information
+
+Do not use the incorrect name:
+
+sand_seller_bucket_information
+
+The Profile page contains one compact Bucket Information card.
+
+Profile behavior:
+
+1. Seller clicks Manage.
+2. Seller searches the Admin-approved Sand material catalogue.
+3. Seller adds only the materials the Seller handles.
+4. Seller enters cubic feet per bucket.
+5. Each material is saved separately.
+
+Example:
+
+Morang
+1 bucket = 30 cubic feet
+
+River Sand
+1 bucket = 28 cubic feet
+
+Sample upload behavior:
+
+- Upload dropdown shows all Admin-approved materials.
+- Configured materials are active/selectable.
+- Unconfigured materials are faded/locked.
+- Clicking an unconfigured material shows guidance:
+  Profile > Bucket information > Material
+- Backend also blocks upload if bucket information is absent.
+
+Conversion:
+
+material rate per feet = rate per bucket / cubic feet per bucket
+
+Example:
+
+₹600 per bucket / 30 cubic feet = ₹20 per feet
+
+Important snapshot rule:
+
+When the sample/order is created, the applicable conversion is stored as a snapshot so later profile changes do not silently alter historical rates.
+
+======================================================================
+12. BUYER COMBINED STONE AND SAND ORDERING
+======================================================================
+
+Buyer ordering uses the same pages for Stone and Sand. Separate Sand Buyer pages are not needed.
+
+Page 5:
+
+- Combined Stone and Sand sample catalogue
+- Stone/Sand slider before the Location filter
+- Default mode: Stone
+- No 'All samples' mode
+- Stone mode shows only Stone samples
+- Sand mode shows only Sand samples
+- Dynamic material filters
+- Location filter
+- Full image preview
+- Buyer quantity selection in feet
+- Existing wording retained:
+  + transportation and permit charges
+- Glow on Selected button/card and View Request bar was reduced
+
+Page 6:
+
+- Combined order confirmation
+- Preserves Stone/Sand identity and sample snapshots
+- Shows total loads/vehicles and total feet
+
+Page 7:
+
+- Buyer rate request details
+- Checking and Rate Ready stages use feet
+- Sand quotation data should use bucket conversion where relevant
+
+Page 8:
+
+- Buyer active order details
+- Feet-based display
+- Derived Loaded display before dispatch if all vehicles are loaded
+
+Page 9:
+
+- Buyer order cards show feet and vehicles for feet-based orders
+- Older ton-based orders remain compatible
+
+Separate Admin catalogues are respected:
+
+- Stone -> platform_materials
+- Sand -> sand_material_catalogue
+
+Each sample/order item carries:
+
+- materialType: stone or sand
+- source sample ID
+- seller public ID
+- seller original rate
+- seller original rate unit
+- cubic feet per bucket for Sand
+- material rate per feet
+
+Important identity rule:
+
+Avoid collisions using materialType plus material name/order item ID.
+
+Example:
+
+stone:M-Sand
+sand:M-Sand
+
+======================================================================
+13. ORDER TABLE AND SNAPSHOT WORK
+======================================================================
+
+The unified Buyer order workflow stores Stone/Sand identity and commercial snapshots.
+
+Important order fields added/used include:
+
+- material_type
+- sample_type
+- source_sample_id
+- seller_public_id
+- seller_rate
+- seller_rate_unit
+- cubic_feet_per_bucket
+- material_rate_per_feet
+- total_feet
+- total_loads
+
+Existing historical ton orders remain compatible.
+
+Database constraint for order item totals accepts either:
+
+- total vehicles and total tons, or
+- total loads and total feet
+
+Important SQL history:
+
+A prior PostgreSQL failure occurred because an INSERT had more target columns than expressions. The latest deployed orders.routes.js includes the corrected matching column/expression counts. Treat orders.routes.js as a protected, high-impact file.
+
+======================================================================
+14. ADMIN RATE REQUEST AND QUOTATION
+======================================================================
+
+Admin Rate Request Details supports Stone and Sand.
+
+For Stone:
+
+- Seller original rate can be ton or feet
+- Ton/Feet calculator
+- Material rate per ton
+- Material rate per feet
+
+For Sand:
+
+- Seller original rate per bucket
+- Bucket/Feet calculator
+- Material rate per bucket
+- Material rate per feet
+
+Sand summary format:
+
+1 bucket = 50 cubic feet
+Seller rate ₹500/bucket
+
+Image popup details include:
+
+- Seller ID
+- Material type
+- Source sample ID
+- Location
+- Mobile
+- Upload time
+- Original recorded Seller rate
+- Conversion
+- Converted feet rate
+- Sample expiry
+- Permit cost
+- Available quantity
+
+Published Sand quotation cards/popup use bucket wording, not ton wording.
+
+Quotation and cost sections support:
+
+- Material cost
+- Permit cost
+- Transportation cost
+- Final estimated cost
+- Transportation methods: per vehicle, per ton, total, per km
+- Per-km method requests total kilometers
+- Final references in feet and original seller unit
+
+======================================================================
+15. ADMIN ACTIVE ORDER DETAILS
+======================================================================
+
+Admin Active Order Details supports Stone and Sand popup information.
+
+Top quantity formatting:
+
+- Maximum two decimal places for tons
+
+Order Overview:
+
+- Stone: feet and tons
+- Sand: feet, tons, and buckets
+
+Rate/Image popup:
+
+- Stone uses Ton-feet calculator
+- Sand uses Bucket-feet calculator
+- Sand format: 1 bucket = X cubic feet
+- Seller original rate and permit are shown
+- Seller ID and source sample ID are shown
+- Permit details are shown
+- Final rates and totals are shown
+
+A Sand Yard Details card has been added under Order Confirmed.
+
+Sand Yard Details displays:
+
+- Sand yard name
+- Token number
+- Estimated loading date/time
+- Vehicle numbers
+- Quantity in buckets
+- Quantity in feet
+- Filled by: ADMIN or SAND_YARD
+- Status: ACCEPTED or REJECTED
+- Optional note/rejection information
+
+======================================================================
+16. SAND SELLER QUEUE
+======================================================================
+
+Frontend page:
+
+StoneRateSellerQueuePage.js
+
+Backend route:
+
+sandSellerOperations.routes.js
+
+Frontend API:
+
+sandSellerOperationsApi.js
+
+Database initializer:
+
+initializeSandSellerOperations.js
+
+Main tables include:
+
+- sand_orders
+- sand_order_vehicles
+- sand_order_loadings
+- sand_yard_order_requests
+
+Queue tabs:
+
+- Requests
+- Upcoming
+- History
+
+Request behavior:
+
+- One Buyer request may contain multiple materials/vehicles.
+- Seller can accept all, one, or multiple entries.
+- Seller can reject all, one, or multiple entries.
+- Unselected entries remain pending.
+- Rejection reasons include Material not available and Other with comment.
+- Acceptance asks for loading date/time and optional note.
+- Past date/time is blocked.
+
+Permit cost:
+
+- Included in Request cards
+- Included in Upcoming cards/details
+- Included per vehicle in Manual Entry
+- Included in History popup
+
+Manual Entry:
+
+- Supports multiple vehicles
+- Creates one card/record per vehicle
+- Each vehicle has its own material, rate, permit, bucket quantity, and estimated time
+
+Queue tokens:
+
+Permanent, continuously increasing per material.
+
+Examples:
+
+- M-Sand: A-001, A-002, A-003...
+- P-Sand: B-001, B-002, B-003...
+- River Sand: C-001, C-002, C-003...
+- Other materials currently use D unless a better Admin-managed prefix system is added later
+
+Tokens are not reused after loading, deletion, or cancellation.
+
+If A-001, A-002, and A-003 are loaded, the next M-Sand entry is A-004.
+
+Upcoming behavior:
+
+- Call option
+- Edit option
+- Delete option
+- Loaded option with double confirmation
+- Clicking a card opens full details
+- StoneRate-originated commercial fields are protected during edit
+- Manual entries allow full editing
+
+History:
+
+- Shows actual loaded time, not estimated time
+- Edit and delete options
+- Permit cost shown in details popup
+
+Important timezone behavior:
+
+- datetime-local input is converted safely to ISO
+- Card displays the entered local time correctly
+- Past dates/times are blocked in Requests, Manual Entry, and Upcoming editing
+
+======================================================================
+17. SAND SELLER HOME
+======================================================================
+
+Frontend page:
+
+StoneRateSandSellerHome.js
+
+Backend/API:
+
+- sandSellerOperations.routes.js
+- sandSellerOperationsApi.js
+- sandSellerNotifications.routes.js
+- sandSellerNotificationsApi.js
+
+Home sections:
+
+- Greeting and Seller name
+- StoneRate brand
+- Notification bell
+- Total Orders material cards
+- Date filter: All, Yesterday, 7 days, 15 days, 1 month, 3 months
+- Today's Orders cards
+- Pending Requests link
+- Recent Loading, latest three entries
+- Side drawer
+- Bottom navigation
+
+Total Orders cards:
+
+- Wider and shorter design
+- Zero-value cards still display for registered materials when no orders exist
+- Shows buckets and trucks
+
+Recent Loading:
+
+- Must read vehicleNumber, with truckNumber as fallback
+- Shows token, estimated time, bucket quantity, source badge
+
+Side drawer categories:
+
+Yard Operations:
+
+- Home
+- Queue
+- Sample Upload
+- Pending Requests
+- Manual Entry
+
+About & Support:
+
+- About StoneRate
+- How StoneRate Works
+- Terms & Conditions
+
+Notifications:
+
+- Persistent notifications
+- Manual Entry Added
+- New Loading Request
+- Sample Expiring Soon
+- Sample Expired
+- Unread badge
+- Mark one read
+- Mark all read
+- Bottom-sheet drawer
+
+======================================================================
+18. SAND SELLER INFORMATION PAGES
+======================================================================
+
+Created and connected:
+
+- SandSellerAboutStoneRate.js
+- SandSellerHowStoneRateWorks.js
+- SandSellerTermsAndConditions.js
+
+These pages match the Sand Seller theme and explain Sand-specific queue, sample, loading, permit, manual/StoneRate request, and platform rules.
+
+======================================================================
+19. SAND YARD SHARED ADMIN/SELLER WORKFLOW
+======================================================================
+
+A shared Sand Yard request is created after the Buyer accepts a Sand quotation.
+
+Shared table:
+
+sand_yard_order_requests
+
+Expected flow when Sand Seller responds first:
+
+Buyer accepts Sand quotation
+-> shared Sand Yard request is created
+-> request appears in the selected Sand Seller's Requests tab
+-> Seller accepts/rejects
+-> Seller queue token and estimated time are saved
+-> Admin Active Order Details reads the same Sand Yard record
+-> Admin sees Filled by SAND_YARD and current status/details
+
+Expected flow when Admin responds first:
+
+Admin opens Active Order Details
+-> Admin fills Sand Yard Details
+-> backend automatically accepts the pending Sand Seller request
+-> permanent material token is generated
+-> Upcoming loading entry is created
+-> shared request is marked ACCEPTED
+-> filled_by is ADMIN
+-> request disappears from Seller Requests
+-> entry appears directly in Seller Upcoming
+-> Seller does not accept again
+
+Important foreign-key fix:
+
+sand_order_loadings.order_id references the legacy sand_orders table, not the main orders table.
+
+For shared main-order Sand Yard loadings, use:
+
+order_id = NULL
+
+The main order relationship remains in:
+
+sand_yard_order_requests.order_id -> orders.id
+
+Latest requested/developed integration files:
+
+- backend/src/routes/admin.routes.js
+- frontend/src/api/adminApi.js
+- frontend AdminActiveOrderDetails component
+
+Admin API function:
+
+saveAdminSandYardDetails(deliveryId, details)
+
+Admin endpoint:
+
+PUT /api/admin/active-orders/:deliveryId/sand-yard
+
+This endpoint should:
+
+1. Lock the matching sand_yard_order_requests row.
+2. If pending, generate the next permanent material queue token.
+3. Insert an Upcoming sand_order_loadings row with order_id = NULL.
+4. Mark request accepted.
+5. Set filled_by to admin.
+6. Return the saved Sand Yard details.
+7. If already accepted, update the existing loading/request rather than create a duplicate.
+
+Admin Active Orders list/API must return sandYardDetails so Seller-submitted details appear after Admin refresh/reopen.
+
+======================================================================
+20. CURRENT IMMEDIATE STATUS
+======================================================================
+
+Completed/working:
+
+- Shared Sand Seller registration and sign-in
+- Sand Seller routing from App.js
+- Sand Seller Profile loading/edit/photo
+- Admin Sand Material Catalogue
+- Seller per-material bucket information
+- Sand Seller sample upload to R2
+- Sand Seller My Samples
+- Sand Seller Samples market
+- 5-day sample validity
+- Independent 24-hour rate and permit cooldowns
+- Sand Seller Queue frontend/backend
+- Partial accept/reject
+- Manual queue entries
+- Permanent queue tokens
+- Sand Seller Home dashboard
+- Sand Seller notifications
+- Combined Buyer Stone/Sand catalogue
+- Stone/Sand slider
+- Mixed Stone/Sand Buyer order submission
+- Admin Sand rate request popup/calculator language
+- Admin Active Order Sand quantity/calculator display
+- Shared Sand Yard request creation after Buyer accepts Sand quotation
+- Seller acceptance creates Upcoming loading
+
+Latest task being completed/tested:
+
+Synchronizing Sand Yard Details between Admin Active Order Details and Sand Seller Queue.
+
+Expected behavior to verify:
+
+A. Seller accepts first
+- Seller request moves to Upcoming
+- token and time are saved
+- Admin refreshes Active Orders list/reopens order
+- Sand Yard Details appears with Filled by SAND_YARD
+
+B. Admin submits first
+- Admin save endpoint auto-accepts pending request
+- Seller request disappears from Requests
+- entry appears in Upcoming
+- Filled by ADMIN
+- Seller does nothing
+
+Potential item to verify after deployment:
+
+- The exact current sand_yard_order_requests schema fields must match the latest admin.routes.js SQL:
+  yard_name
+  token_number
+  estimated_date_time
+  vehicle_numbers
+  quantity_buckets
+  quantity_feet
+  filled_by
+  status
+  rejection_reason
+  note
+  updated_at
+
+If Render reports a missing column, inspect the latest initDatabase.js definition before changing any route.
+
+======================================================================
+21. FILES TO TREAT AS HIGH RISK
+======================================================================
+
+These files are large and connected to many pages:
+
+- src/routes/orders.routes.js
+- src/routes/admin.routes.js
+- src/initDatabase.js
+- src/App.js
+
+Rules for editing:
+
+- Always request the latest deployed copy.
+- Do not recreate from chat memory.
+- Do not remove or rename unrelated endpoints.
+- Avoid global formatting changes.
+- Make targeted additions/replacements.
+- Run node --check.
+- For SQL INSERT/UPDATE, verify target columns, expressions, placeholders, and parameters.
+- Confirm old Stone Seller, Buyer, and Admin workflows are preserved.
+
+======================================================================
+22. IMPORTANT PREVIOUS ERRORS AND FIXES
+======================================================================
+
+1. PostgreSQL 42P08 inconsistent parameter types
+
+Fix by explicitly casting reused SQL parameters, such as:
+
+$13::varchar
+$8::numeric
+
+2. Duplicate seed primary keys
+
+Use:
+
+ON CONFLICT DO NOTHING
+
+when either the primary key or normalized unique field can conflict.
+
+This was needed for:
+
+- buyer_feet_options
+- sand_material_catalogue Morang seed
+
+3. Blank React pages
+
+Common causes found:
+
+- Using variables before declaration
+- Child components referencing parent-scope variables such as displaySeller
+- Missing icon imports such as Layers or RefreshCw
+- Invalid ESLint-disable rules
+
+Always run a real JSX bundle check, not only node --check.
+
+4. R2 invalid metadata header
+
+Encode material metadata with encodeURIComponent.
+
+5. sand_order_loadings foreign-key error
+
+Main orders IDs cannot be inserted into sand_order_loadings.order_id because that column references sand_orders.
+Use order_id = NULL and link through sand_yard_order_requests.
+
+6. Wrong bucket-information table name
+
+Correct:
+
+seller_sand_bucket_information
+
+Incorrect:
+
+sand_seller_bucket_information
+
+======================================================================
+23. RECOMMENDED NEXT TEST SEQUENCE
+======================================================================
+
+1. Deploy the latest Admin Sand Yard synchronization files.
+2. Create a fresh Buyer Sand rate request.
+3. Admin publishes a Sand quotation.
+4. Buyer accepts the Sand quotation.
+5. Confirm the Sand request appears for the selected Sand Seller.
+6. Test Seller-first flow:
+   - Seller accepts
+   - token/time saved
+   - entry moves to Upcoming
+   - Admin refreshes/reopens Active Order
+   - Sand Yard Details shows Seller information
+7. Test Admin-first flow with another fresh order:
+   - Admin fills Sand Yard Details while Seller request is pending
+   - request auto-accepts
+   - Seller sees Upcoming directly
+   - no duplicate acceptance is required
+8. Test Admin edit of an already accepted Sand Yard request.
+9. Confirm no duplicate queue entry is created.
+10. Confirm permanent token sequence continues.
+
+======================================================================
+24. READY-TO-PASTE MESSAGE FOR A NEW CHAT
+======================================================================
+
+Paste the following message into a new chat and attach this handoff file:
+
+"We are continuing the StoneRate project. Read the attached StoneRate project handoff completely before responding. The frontend repository is Shyam7291/my-app-frontend and the backend repository is Shyam7291/my-app-backend. Render hosts My App Frontend and My App Backend, and Cloudflare R2 stores images. Stone Seller and Sand Seller share authentication but have separate operational modules.
+
+The current task is to complete and test shared Sand Yard Details synchronization between Admin Active Order Details and the Sand Seller Queue. If the Sand Seller accepts first, the saved token, schedule, vehicle, quantity, status, and Filled by SAND_YARD must appear in Admin after refresh/reopen. If Admin submits first, the pending Seller request must auto-accept, generate a permanent material token, create the Seller Upcoming entry, set Filled by ADMIN, and require no Seller acceptance.
+
+Use only the latest uploaded/deployed files as the base. In particular, orders.routes.js, admin.routes.js, initDatabase.js, and App.js are high-risk files. Do not remove unrelated code or rebuild them from older copies. Provide complete updated code as downloadable .txt files, run syntax/JSX/SQL consistency checks, and state exactly which GitHub paths must be replaced."
+======================================================================
+25. PROJECT UPDATE: TRANSPORTER MODULE
+Update date: 27 September 2026
+======================================================================
+This section records the Transporter work completed after the original
+15 September 2026 handoff.
+
+Transporter frontend status:
+- The Transporter frontend has been created and connected to the shared app.
+- Transporter-created sample orders are shown under Transporter Your Orders.
+- Admin has a separate By Transporter view inside Active Orders.
+- Transporter Request IDs use the TR-YYMMDD-NNN format.
+- Child Transporter Delivery IDs use the TD-YYMMDD-NNN format.
+- One TR request can contain multiple accepted materials, sellers, pickup
+  locations, and TD deliveries.
+
+Important Transporter frontend pages/APIs now include:
+- AdminActiveOrders.js
+- AdminTransporterActiveOrderDetails.js or the corresponding
+  StoneRateAdminTransporterActiveOrderDetails component
+- StoneRateTransporterYourOrderDetails.js
+- adminApi.js
+- transporterSampleOrdersApi.js
+- App.js routing and callback integration
+
+Important Transporter backend route:
+- src/routes/transporterSampleOrders.routes.js
+
+Important note:
+The older backend structure list in section 6 predates the Transporter route.
+The latest backend now includes transporterSampleOrders.routes.js and the
+server must mount that router. Always use the latest deployed route because
+this file now contains request creation, Seller response conversion,
+Transporter order details, Admin active-order operations, vehicle operations,
+completion, reopening, and cross-material vehicle movement.
+
+======================================================================
+26. TRANSPORTER REQUEST GROUPING AND MULTI-SELLER DISPLAY
+======================================================================
+Completed/developed behavior:
+- Admin Active Orders groups child TD deliveries under one parent TR request.
+- A grouped card shows all child delivery IDs.
+- A grouped card shows all materials and their requested quantities.
+- Multiple Seller names are shown instead of only the first Seller.
+- Multiple pickup locations are shown as Multi location.
+- Duplicate Seller names and duplicate locations are removed.
+- Search covers request ID, delivery IDs, Transporter, Sellers, materials,
+  and pickup locations.
+
+Admin Transporter Active Order Details behavior:
+- The page opens the parent TR request and loads all child TD deliveries.
+- All materials are displayed, including separate 20mm and 40mm materials.
+- All delivery IDs are displayed at the top.
+- Each Seller has a separate full Seller & Pickup card.
+- Each Seller card has its own Seller ID, plant/business name, phone,
+  location, address, material, sample code, Navigate, and Call Seller action.
+- Material cards show the Seller associated with that material.
+- Material image reference popups resolve Seller details through the
+  material's sellerId, not through the first Seller in the request.
+- Call Seller and Copy Information in each reference popup use the selected
+  material's actual Seller.
+- Combined activity and vehicle information is loaded from all child
+  deliveries.
+
+Important data-shaping rule:
+Every grouped material should carry at least:
+- deliveryId
+- sellerId
+- sellerName
+- pickupLocation
+- source material/sample information
+
+Every grouped vehicle should carry at least:
+- deliveryId
+- materialIds
+- actual vehicle number
+- operational status and timestamps
+
+======================================================================
+27. TRANSPORTER VEHICLE WORKFLOW
+======================================================================
+Final intended vehicle behavior:
+- Requested vehicle count is only a planning estimate.
+- Admin can use fewer or additional actual vehicles where the backend rules
+  allow it.
+- A vehicle input row must appear only after Admin clicks Add Vehicle.
+- Saving one or two vehicle numbers must not automatically create another
+  blank input row.
+- Empty planning slots must not appear as actual operational vehicle cards.
+- Vehicle cards and vehicle selection controls must include only records with
+  a non-empty saved vehicle number.
+- A newly entered vehicle number is material-neutral.
+- Saving a vehicle number must not automatically allocate 20mm, 40mm, or any
+  other material.
+- Admin explicitly chooses one vehicle and one material while recording a
+  status update.
+- Material selection is single-choice for one vehicle status operation.
+
+Expected status-update flow:
+1. Select one actual numbered vehicle.
+2. Select one material explicitly.
+3. Select Loading, Loaded, or Dispatched.
+4. Enter loaded quantity when Loaded or Dispatched requires it.
+5. Add an optional Admin note where appropriate.
+6. Save the vehicle status.
+
+Cross-material movement:
+- A vehicle can be selected for any material within the same parent TR
+  request, even if its database record currently exists under another child
+  TD delivery.
+- Frontend sends transporterDeliveryId for the selected material's target
+  delivery.
+- Frontend sends sourceTransporterDeliveryId for the delivery where the
+  vehicle currently exists.
+- Backend verifies source and target deliveries belong to the same TR request.
+- Backend moves/reassigns the vehicle to the selected material delivery,
+  applies the material ID and status, writes activity under the target
+  delivery, and recalculates source and target delivery statuses.
+- The old error "One or more selected vehicles do not belong to this order"
+  must not be returned for a valid cross-material move inside the same TR.
+
+Duplicate/empty vehicle handling:
+- Blank vehicle_number records are planning slots and are excluded from
+  operational responses.
+- Duplicate actual vehicle numbers across child deliveries are de-duplicated.
+- When duplicates exist, retain the most operationally advanced record;
+  if statuses are equal, retain the most recently updated record.
+
+======================================================================
+28. TRANSPORTER QUANTITY DISPLAY RULES
+======================================================================
+Admin status form quantity rule:
+- Never add the requested quantities of all materials when one material is
+  selected.
+- Display remaining demand only for the selected material.
+
+Formula:
+remaining quantity for selected material
+= selected material requested quantity
+- loaded quantity already recorded for that material
+
+Example:
+- 20mm requested: 2 ton
+- 40mm requested: 2 ton
+- Selected material: 20mm
+- Previously loaded for 20mm: 0 ton
+- Remaining to load shown in the form: 2 ton
+
+If 0.5 ton is already loaded for 20mm:
+- Remaining to load: 1.5 ton
+- Supporting text: 0.5 ton already loaded of 2 ton
+
+The second information box in the form should describe the quantity previously
+recorded for the selected vehicle, which is separate from the selected
+material's total remaining demand.
+
+======================================================================
+29. TRANSPORTER YOUR ORDER DETAILS
+======================================================================
+The Transporter Your Order Details endpoint must expose only real operational
+vehicles.
+
+Required backend response behavior:
+- Exclude records where vehicle_number is NULL.
+- Exclude records where vehicle_number is empty or whitespace only.
+- Do not convert planning slots into cards named Vehicle 3, Vehicle 4, etc.
+- De-duplicate the same actual vehicle number across child deliveries.
+- actualVehicleCount must equal the number of unique actual numbered vehicles.
+- Material-level operationalVehicles arrays must also exclude blank slots.
+
+Example:
+If Admin saved only:
+- UP32AB7382
+- UP32AB6565
+
+Transporter Vehicle Status Information must show exactly two cards.
+The top planning indicator may still say "2 of 4 truck numbers filled" when
+four was the original requested estimate, but the operational section must not
+show placeholder Vehicle 3 and Vehicle 4 cards.
+
+The latest route correction filters database rows using a nonblank
+vehicle_number condition and de-duplicates by normalized vehicle number before
+returning the Transporter order details response.
+
+======================================================================
+30. TRANSPORTER ORDER COMPLETION AND CORRECTION
+======================================================================
+Developed behavior includes:
+- Admin can close a Transporter delivery/order as completed.
+- Full and partial completion are supported.
+- Partial completion requires an Admin explanation when actual loaded quantity
+  is below requested quantity.
+- Completion snapshots preserve requested quantity, actual quantity, unit,
+  requested vehicle count, actual vehicle count, completion type, completion
+  time, and completion note.
+- Dispatched orders are locked for edits unless reopened for correction.
+- Reopening keeps activity history and enables correction of vehicle numbers,
+  quantities, notes, and statuses.
+- Statuses must not move backward unless correction mode allows it.
+
+When a parent TR request has multiple child deliveries, completion/reopening
+must be checked carefully so one child delivery's state does not incorrectly
+hide or unlock another child delivery.
+
+======================================================================
+31. LATEST TRANSPORTER FILE BASELINES AND DEPLOYMENT CAUTION
+======================================================================
+The following recently updated files must be treated as connected:
+Frontend:
+- src/pages/AdminActiveOrders.js
+- src/pages/AdminTransporterActiveOrderDetails.js
+- src/pages/StoneRateTransporterYourOrderDetails.js
+- src/api/adminApi.js
+- src/api/transporterSampleOrdersApi.js
+- src/App.js
+
+Backend:
+- src/routes/transporterSampleOrders.routes.js
+- src/server.js when router mounting changes are required
+- src/initDatabase.js when schema changes are required
+
+Important deployment rule:
+- Do not combine an older frontend details page with a newer backend route.
+- Do not combine an older backend route with grouped TR request UI.
+- Always upload the latest deployed file before another change.
+- Preserve multi-Seller reference mapping, grouped deliveries, completion,
+  correction mode, cross-material movement, and blank-slot filtering.
+
+Recent generated filenames describe the fixes but are not repository paths.
+Repository files must retain their real source names when copied into GitHub.
+Examples of recent generated descriptions include:
+- multi-seller-location
+- multi-delivery-details
+- seller-reference-fixed
+- free-vehicle-material-selection
+- hide-empty-slots-fixed
+- cross-material-vehicle-fixed
+- selected-material-remaining-qty-fixed
+- transporter-real-vehicles-only
+
+Before deployment, the latest changes should be consolidated into the current
+repository files rather than deploying multiple descriptive copies.
+
+======================================================================
+32. TRANSPORTER VERIFICATION CHECKLIST
+======================================================================
+Run this sequence with a fresh multi-material request:
+1. Create one TR request containing at least 20mm and 40mm materials from two
+   Sellers or locations.
+2. Accept both Seller items and confirm two child TD deliveries exist.
+3. Open Admin Active Orders > By Transporter.
+4. Confirm one grouped TR card shows both TD IDs, both materials, both Sellers,
+   and Multi location.
+5. Open details and verify both full Seller cards.
+6. Open each material reference image and verify the correct Seller name, ID,
+   phone, location, sample code, image, rate, permit, and quantity.
+7. Add exactly two vehicle numbers and save.
+8. Confirm no third blank input row appears unless Add Vehicle is clicked.
+9. Confirm Admin operational vehicle cards show exactly two numbered vehicles.
+10. Confirm no material is automatically allocated when vehicle numbers are
+    saved.
+11. Select vehicle 1 + 20mm + Loading and save.
+12. Select vehicle 2 + 40mm + Loading and save.
+13. Confirm cross-delivery selection does not produce the old ownership error.
+14. Select Loaded and confirm Remaining to load uses only the selected
+    material's demand.
+15. Open Transporter Your Order Details and confirm exactly two operational
+    vehicle cards are displayed.
+16. Confirm blank planned slots never appear as Vehicle 3 or Vehicle 4.
+17. Verify completion, partial completion note, reopening, correction, and
+    activity logs.
+18. Refresh Admin and Transporter pages and verify states remain consistent.
+
+======================================================================
+33. UPDATED CURRENT IMMEDIATE STATUS
+======================================================================
+Previously documented Sand Seller and Sand Yard work remains relevant.
+Additional Transporter work completed/developed after 15 September 2026:
+- Transporter frontend created and connected to the shared application.
+- Transporter backend route added and expanded.
+- Admin Active Orders has grouped By Transporter request cards.
+- Multi-material, multi-delivery, multi-Seller, and multi-location display.
+- Material-specific Seller reference details.
+- Flexible actual vehicle-number management.
+- Empty planning slots hidden from Admin operational UI.
+- Material-neutral vehicle creation.
+- Explicit vehicle/material/status allocation.
+- Cross-material vehicle movement within the same parent TR request.
+- Selected-material remaining-quantity display.
+- Transporter Your Order Details returns only unique, actual numbered vehicles.
+- Completion and correction/reopen workflows developed.
+
+Deployment/testing caution:
+The project has undergone several related Transporter file revisions. Verify
+that the latest frontend and backend files are deployed together. A symptom
+such as placeholder vehicle cards, wrong Seller references, combined material
+quantity, or cross-delivery ownership errors usually means one connected file
+is older than the others.
+
+======================================================================
+34. UPDATED READY-TO-PASTE MESSAGE FOR A NEW CHAT
+======================================================================
+"We are continuing the StoneRate project. Read the attached updated project
+handoff completely before responding. The frontend repository is
+Shyam7291/my-app-frontend and the backend repository is
+Shyam7291/my-app-backend. Render hosts My App Frontend and My App Backend, and
+Cloudflare R2 stores images.
+
+Stone Seller and Sand Seller share authentication but use separate operational
+modules. The project now also has a Transporter frontend and the backend route
+src/routes/transporterSampleOrders.routes.js.
+
+For Transporter active orders, one parent TR request can contain multiple TD
+deliveries, materials, Sellers, and pickup locations. Admin cards and details
+must remain grouped by TR. Seller cards and material reference popups must use
+the Seller linked to each material. Actual vehicle numbers are material-neutral
+until Admin explicitly selects one vehicle, one material, and a status. Empty
+planning slots must not appear as actual vehicle cards. Cross-material vehicle
+selection inside the same TR must move/reassign the vehicle to the selected
+material delivery. Remaining quantity must be calculated only for the selected
+material. Transporter Your Order Details must return only unique vehicles with
+real nonblank vehicle numbers.
+
+The Sand Yard synchronization work from the original handoff remains relevant:
+Seller-first acceptance must appear in Admin, and Admin-first submission must
+auto-accept the Seller request and create Upcoming without duplication.
+
+Use only the latest uploaded/deployed files as the base. High-risk files include
+orders.routes.js, admin.routes.js, transporterSampleOrders.routes.js,
+initDatabase.js, and App.js. Do not remove unrelated functionality or rebuild
+large files from old chat copies. Provide complete updated files as downloadable
+.txt files. Run JavaScript syntax, JSX bundle, SQL placeholder/count, and
+cross-file consistency checks. State the exact GitHub paths to replace."
+
+======================================================================
+END OF UPDATED HANDOFF
+======================================================================
