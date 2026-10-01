@@ -152,4 +152,82 @@ def attach_file(messages):
             output_name = f"{name}_updated_{timestamp}{ext}"
             output_path = os.path.join(DOWNLOADS_FOLDER, output_name)
 
-            os.makedirs
+            os.makedirs(DOWNLOADS_FOLDER, exist_ok=True)
+
+            updated_content = clean_ai_code(answer)
+
+            with open(output_path, "w", encoding="utf-8") as output_file:
+                output_file.write(updated_content)
+
+            print("\nUpdated file saved to:")
+            print(output_path)
+            print()
+
+    except Exception as error:
+        print("\nAPI error:", error, "\n")
+
+
+messages = load_history()
+
+print("\nCodeCraft Claude Chat")
+print("Commands:")
+print("  /file    Attach and analyze a text or code file")
+print("  /clear   Delete the saved conversation history")
+print("  /exit    Save history and close the chat\n")
+
+if len(messages) > 1:
+    print("Previous conversation history loaded.\n")
+
+while True:
+    question = input("You: ").strip()
+
+    if question.lower() in {"/exit", "exit", "quit"}:
+        save_history(messages)
+        print("Conversation saved. Chat closed.")
+        break
+
+    if question.lower() == "/file":
+        attach_file(messages)
+        continue
+
+    if question.lower() == "/clear":
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You are a helpful coding and file-analysis assistant. "
+                    "When asked to update a file, provide the complete updated "
+                    "file content without omitting unchanged sections."
+                )
+            }
+        ]
+        save_history(messages)
+        print("\nConversation history cleared.\n")
+        continue
+
+    if not question:
+        continue
+
+    messages.append({
+        "role": "user",
+        "content": question
+    })
+
+    try:
+        response = openai.ChatCompletion.create(
+            model=MODEL,
+            messages=messages
+        )
+
+        answer = response["choices"][0]["message"]["content"]
+        print("\nClaude:", answer, "\n")
+
+        messages.append({
+            "role": "assistant",
+            "content": answer
+        })
+
+        save_history(messages)
+
+    except Exception as error:
+        print("\nAPI error:", error, "\n")
