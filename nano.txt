@@ -1,0 +1,155 @@
+import os
+import json
+import openai
+from datetime import datetime
+
+openai.api_key = os.getenv("CODECRAFT_API_KEY")
+openai.api_base = "https://codecraftapi.com/v1"
+
+MODEL = "claude-opus-5.5"
+HISTORY_FILE = os.path.expanduser("~/codecraft_history.json")
+DOWNLOADS_FOLDER = os.path.expanduser("~/storage/downloads")
+
+SUPPORTED_EXTENSIONS = {
+    ".txt", ".js", ".jsx", ".ts", ".tsx", ".json",
+    ".html", ".css", ".py", ".java", ".xml", ".md",
+    ".csv", ".sql", ".php", ".c", ".cpp", ".h"
+}
+
+
+def load_history():
+    if not os.path.exists(HISTORY_FILE):
+        return [
+            {
+                "role": "system",
+                "content": (
+                    "You are a helpful coding and file-analysis assistant. "
+                    "When asked to update a file, provide the complete updated "
+                    "file content without omitting unchanged sections."
+                )
+            }
+        ]
+
+    try:
+        with open(HISTORY_FILE, "r", encoding="utf-8") as file:
+            return json.load(file)
+    except Exception:
+        return [
+            {
+                "role": "system",
+                "content": "You are a helpful coding and file-analysis assistant."
+            }
+        ]
+
+
+def save_history(messages):
+    with open(HISTORY_FILE, "w", encoding="utf-8") as file:
+        json.dump(messages, file, ensure_ascii=False, indent=2)
+
+
+def clean_ai_code(answer):
+    cleaned = answer.strip()
+
+    if cleaned.startswith("```") and cleaned.endswith("```"):
+        lines = cleaned.splitlines()
+
+        if lines:
+            lines = lines[1:]
+
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+
+        cleaned = "\n".join(lines)
+
+    return cleaned
+
+
+def attach_file(messages):
+    print("\nEnter the full file path.")
+    print("Example: /storage/emulated/0/Download/App.js")
+    print("You may also use: ~/storage/downloads/App.js\n")
+
+    file_path = input("File path: ").strip()
+    file_path = file_path.strip('"').strip("'")
+    file_path = os.path.expanduser(file_path)
+
+    if not os.path.isfile(file_path):
+        print("\nFile not found. Check the path and try again.\n")
+        return
+
+    extension = os.path.splitext(file_path)[1].lower()
+
+    if extension not in SUPPORTED_EXTENSIONS:
+        print("\nThis version currently supports text and code files only.\n")
+        return
+
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            file_content = file.read()
+    except UnicodeDecodeError:
+        print("\nThe file is not readable as a text file.\n")
+        return
+    except Exception as error:
+        print("\nCould not open the file:", error, "\n")
+        return
+
+    if len(file_content) > 100000:
+        print("\nThe file is too large. Current limit is 100,000 characters.\n")
+        return
+
+    print("\nFile attached:", os.path.basename(file_path))
+    instruction = input("What should Claude do with this file? ").strip()
+
+    if not instruction:
+        print("\nNo instruction entered.\n")
+        return
+
+    prompt = (
+        f"File name: {os.path.basename(file_path)}\n\n"
+        f"User instruction:\n{instruction}\n\n"
+        f"Complete file content:\n"
+        f"--- FILE START ---\n"
+        f"{file_content}\n"
+        f"--- FILE END ---\n\n"
+        f"If the user requested changes, return the complete updated file "
+        f"content inside one code block. Do not omit unchanged sections."
+    )
+
+    messages.append({
+        "role": "user",
+        "content": prompt
+    })
+
+    print("\nClaude is analyzing the file...\n")
+
+    try:
+        response = openai.ChatCompletion.create(
+            model=MODEL,
+            messages=messages
+        )
+
+        answer = response["choices"][0]["message"]["content"]
+        print("Claude:\n")
+        print(answer)
+        print()
+
+        messages.append({
+            "role": "assistant",
+            "content": answer
+        })
+
+        save_history(messages)
+
+        save_choice = input(
+            "Save Claude's response as an updated file? (yes/no): "
+        ).strip().lower()
+
+        if save_choice in {"yes", "y"}:
+            original_name = os.path.basename(file_path)
+            name, ext = os.path.splitext(original_name)
+
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_name = f"{name}_updated_{timestamp}{ext}"
+            output_path = os.path.join(DOWNLOADS_FOLDER, output_name)
+
+            os.makedirs
