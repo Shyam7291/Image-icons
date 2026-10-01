@@ -1,0 +1,782 @@
+Build a new responsive Admin page for StoneRate named:
+
+StoneRateAdminUsersPartners.js
+
+Page purpose:
+Allow StoneRate Admins to view, filter, search, register, and inspect all platform users and business partners from one unified interface.
+
+The page must support these five user categories:
+
+1. Buyers
+2. Stone Sellers
+3. Sand Sellers
+4. Transporters
+5. Admins
+
+IMPORTANT DESIGN DIRECTION
+
+Focus heavily on visual design and usability.
+
+The page must look polished, premium, modern, attractive, and operationally professional. It should not look like a plain database table or basic admin template.
+
+Use the existing StoneRate Admin Rate Requests page as the primary theme reference.
+
+Match its visual language:
+
+- Warm ivory or off-white page background
+- StoneRate orange as the primary action color
+- Dark navy text
+- Soft grey secondary text
+- Rounded cards
+- Subtle shadows
+- Thin warm borders
+- Compact uppercase labels
+- Status pills
+- Smooth hover and press states
+- Mobile-first responsive layout
+- Professional spacing and typography
+- Clear visual hierarchy
+- Sticky top controls where useful
+- Elegant loading skeletons
+- Meaningful empty states
+- No horizontal page overflow
+
+Do not redesign the broader Admin navigation. Build only the Users & Partners content page and connect it through the existing Admin menu callback.
+
+PAGE HEADER
+
+Create a premium page header containing:
+
+- Back button
+- Small uppercase eyebrow text:
+  USERS & PARTNERS
+
+- Main title:
+  Platform Directory
+
+- Supporting description:
+  Manage Buyers, Sellers, Sand Sellers, Transporters, and Admin accounts.
+
+- Search icon or search field
+- Optional refresh button
+
+The header should feel similar to the Admin Rate Requests header.
+
+A compact header may become sticky when scrolling, but it must not block page scrolling.
+
+ROLE FILTERS
+
+Directly below the header, add five horizontally scrollable filter tabs:
+
+- Buyers
+- Stone Sellers
+- Sand Sellers
+- Transporters
+- Admins
+
+Use icons and count badges.
+
+Examples:
+
+Buyers
+200
+
+Stone Sellers
+86
+
+Sand Sellers
+34
+
+Transporters
+58
+
+Admins
+4
+
+The selected filter should use:
+
+- Orange border
+- Warm orange background tint
+- Dark or orange text
+- Slight shadow
+- Clear active-state indicator
+
+Inactive filters should use:
+
+- White or soft grey background
+- Muted icon
+- Dark text
+- Thin neutral border
+
+Filters must remain usable on mobile. Allow horizontal scrolling without showing an unattractive scrollbar.
+
+Default selected filter:
+
+Buyers
+
+Changing the filter must:
+
+- Update the summary statistics
+- Update the searchable records
+- Reset pagination if applicable
+- Keep the page at the records section
+- Update role-specific table labels
+- Avoid a full-page refresh
+
+SUMMARY STATISTICS
+
+Below the role filters, show three attractive summary cards for every category except Admins.
+
+Summary cards:
+
+1. TOTAL
+   Example:
+   200
+   Registered Buyers
+
+2. PAST 1 MONTH
+   Example:
+   94
+   New registrations
+
+3. LOCATIONS
+   Example:
+   3
+   Cities represented
+
+For Admins, show:
+
+1. TOTAL ADMINS
+2. ACTIVE ADMINS
+3. SUPER ADMINS
+
+Summary design:
+
+- Use three cards in one row on wider screens
+- Use a three-column compact layout or horizontal scroll on mobile
+- Give every card its own subtle accent color
+- Use large numbers
+- Use compact supporting labels
+- Include a small icon
+- Add a light gradient or decorative shape
+- Keep the cards visually consistent with the Rate Requests statistics area
+
+Do not show full addresses in the location statistic.
+
+NEW REGISTRATION BUTTON
+
+Below the statistics, add a prominent button:
+
++ New Registration
+
+The button should:
+
+- Use StoneRate orange
+- Have a plus icon
+- Have a subtle gradient
+- Include a soft shadow
+- Show a pressed state
+- Remain highly visible but not oversized
+
+Role-aware button text is preferred:
+
+- Register New Buyer
+- Register New Stone Seller
+- Register New Sand Seller
+- Register New Transporter
+- Register New Admin
+
+Clicking the button should call:
+
+onNewRegistration(selectedRole)
+
+Do not build registration forms in this page unless separately requested.
+
+SEARCH AND SORT TOOLBAR
+
+Above the records, add a toolbar containing:
+
+Search field placeholder:
+
+Search by name, agency, city, state, phone, or ID
+
+Search should match:
+
+- User name
+- Business or agency name
+- Public ID
+- City
+- State
+- Phone number where Admin access permits it
+
+Add a sort control with:
+
+- Newest joined
+- Oldest joined
+- Name A to Z
+- Name Z to A
+- City A to Z
+
+Optional filter button:
+
+Filters
+
+Expandable filters may include:
+
+- Active
+- Inactive
+- Verified
+- Pending verification
+- City
+- State
+- Joined-date range
+
+RECORDS SECTION
+
+Add a section header:
+
+Registered Buyers
+
+Change it according to the selected role:
+
+- Registered Buyers
+- Registered Stone Sellers
+- Registered Sand Sellers
+- Registered Transporters
+- Registered Admins
+
+Show the result count:
+
+200 records
+
+DESKTOP AND TABLET TABLE DESIGN
+
+Use a polished table with a sticky header row.
+
+For Buyers:
+
+S.NO
+NAME
+LOCATION
+ID
+JOINED DATE
+ACTION
+
+For Stone Sellers:
+
+S.NO
+NAME
+PLANT OR BUSINESS
+LOCATION
+ID
+JOINED DATE
+ACTION
+
+For Sand Sellers:
+
+S.NO
+NAME
+SAND YARD
+LOCATION
+ID
+JOINED DATE
+ACTION
+
+For Transporters:
+
+S.NO
+NAME
+AGENCY NAME
+LOCATION
+ID
+JOINED DATE
+ACTION
+
+For Admins:
+
+S.NO
+NAME
+ADMIN ROLE
+ID
+JOINED DATE
+ACTION
+
+The user requested Agency Name as a core column, but this label must adapt according to the selected category.
+
+LOCATION PRIVACY RULE
+
+Never show a full street address in the normal list.
+
+Only show:
+
+City, State
+
+Example:
+
+Sonbhadra, Uttar Pradesh
+
+Do not show:
+
+House number
+Street
+Landmark
+PIN code
+Exact plant coordinates
+Exact source location
+
+Normal row example:
+
+1.
+Shyam
+Shyam Yards
+Sonbhadra, Uttar Pradesh
+S100003
+28 Sep 2026
+View Details
+
+RECORD ROW DESIGN
+
+Every row should feel like a modern business record, not a plain spreadsheet.
+
+Include:
+
+- Serial number
+- Circular initials avatar
+- User or owner name
+- Business, plant, yard, or agency name
+- City and state with location icon
+- Public ID in a compact monospaced pill
+- Joined date
+- Account-status badge
+- View Details button
+- Chevron icon
+
+Example:
+
+[SS]
+Shyam
+Shyam Yards
+
+Sonbhadra, Uttar Pradesh
+
+S100003
+Joined 28 Sep 2026
+
+ACTIVE
+View Details >
+
+Use role-aware avatar colors:
+
+- Buyer: Blue
+- Stone Seller: Orange
+- Sand Seller: Golden or amber
+- Transporter: Green or teal
+- Admin: Purple or dark navy
+
+Status badges:
+
+- ACTIVE
+- INACTIVE
+- VERIFIED
+- PENDING
+- SUSPENDED
+
+Use subtle, accessible status colors.
+
+MOBILE RECORD DESIGN
+
+Do not force the full table horizontally on narrow mobile screens.
+
+On mobile, transform every row into a compact record card.
+
+Suggested mobile card structure:
+
+Top row:
+- Serial number
+- Avatar
+- Name
+- Status badge
+
+Middle:
+- Agency, plant, yard, or business name
+- Public ID
+- City and state
+- Joined date
+
+Bottom:
+- Full-width View Details button
+
+Mobile example:
+
+01
+
+SH
+Shyam
+ACTIVE
+
+Shyam Yards
+Seller ID: S100003
+Sonbhadra, Uttar Pradesh
+Joined: 28 Sep 2026
+
+[ View Details ]
+
+Maintain consistent spacing and a premium card shadow.
+
+VIEW DETAILS ACTION
+
+Each row must have:
+
+View Details
+
+On click, call:
+
+onViewUserDetails({
+  role: selectedRole,
+  publicId: record.publicId,
+  record
+})
+
+The parent App.js should store the selected record and navigate to the correct Admin user-details page.
+
+Do not expose full sensitive information inside the list.
+
+The future details page may show:
+
+- Full registered name
+- Public ID
+- Account type
+- Agency, plant, or yard details
+- Phone verification state
+- Contact details
+- Full location where Admin is authorized
+- Registration timestamp
+- Account status
+- Activity summary
+- Orders or requests
+- Edit status
+- Suspend account
+- Audit log
+
+LOADING STATE
+
+When records are loading:
+
+- Show skeleton statistics cards
+- Show skeleton filter counts if necessary
+- Show 6 to 8 skeleton record rows
+- Do not display an empty white screen
+- Do not shift the entire layout after loading
+
+ERROR STATE
+
+Show a professional error card:
+
+Unable to load users and partners
+
+Supporting text:
+
+Check the connection and try again.
+
+Action:
+
+Retry
+
+EMPTY STATE
+
+If a selected role has no records:
+
+No Transporters registered yet
+
+Supporting message:
+
+New Transporter accounts will appear here after registration.
+
+Primary action:
+
+Register New Transporter
+
+Use an attractive role-specific empty-state illustration or icon.
+
+PAGINATION OR LOAD MORE
+
+If many records exist, support either:
+
+- Pagination
+- Load More
+- Infinite scroll with proper loading state
+
+Preferred first implementation:
+
+Load More
+
+Example:
+
+Showing 20 of 200 Buyers
+
+[ Load More ]
+
+Do not load hundreds of records into the page at once.
+
+STICKY TABLE HEADER
+
+On desktop and tablet, the records header may remain sticky while scrolling.
+
+The page itself must scroll normally.
+
+Do not use:
+
+height: 100vh;
+overflow: hidden;
+
+on the main page or root wrapper.
+
+Use:
+
+min-height: 100vh;
+height: auto;
+
+If there is a fixed Admin header, ensure the content wrapper uses:
+
+overflow-y: auto;
+min-height: 0;
+
+and does not block page scrolling.
+
+ACCESSIBILITY
+
+- All buttons must have readable labels
+- Icons must not be the only means of communicating actions
+- Use sufficient color contrast
+- Add visible keyboard focus styles
+- Use semantic buttons
+- Add aria-labels for icon-only controls
+- Do not rely only on color for account status
+- Make the filter tabs keyboard accessible
+- Make the table readable by screen readers
+
+DATA STRUCTURE
+
+Normalize every role into a shared record shape:
+
+{
+  publicId: "S100003",
+  role: "stone_seller",
+  name: "Shyam",
+  businessName: "Shyam Yards",
+  city: "Sonbhadra",
+  state: "Uttar Pradesh",
+  joinedAt: "2026-09-28T10:30:00.000Z",
+  status: "active",
+  phoneVerified: true
+}
+
+Use role-specific source mappings:
+
+Buyer:
+- publicId
+- name
+- city
+- state
+- joinedAt
+- status
+
+Stone Seller:
+- seller public ID
+- owner name
+- plant or business name
+- city
+- state
+- joined date
+- account status
+
+Sand Seller:
+- Sand Seller public ID
+- owner name
+- Sand Yard or business name
+- city
+- state
+- joined date
+- status
+
+Transporter:
+- Transporter public ID
+- owner name
+- agency name
+- city
+- state
+- joined date
+- status
+
+Admin:
+- Admin public ID
+- name
+- Admin role
+- joined date
+- status
+
+PRIVACY AND SECURITY
+
+- Do not expose complete addresses in the list
+- Do not expose passwords
+- Do not expose OTP data
+- Do not expose authentication tokens
+- Do not show personal phone numbers unless specifically authorized
+- Do not show Seller source coordinates
+- Do not trust role values sent only by the frontend
+- Backend endpoints must verify Admin authorization
+- Validate role filters on the backend
+- Use server-side pagination
+- Sanitize search input
+- Limit search length
+- Rate-limit sensitive administration endpoints
+- Record sensitive Admin changes in the activity log
+
+API DESIGN
+
+Use a backend endpoint such as:
+
+GET /api/admin/users-partners
+
+Query parameters:
+
+role=buyer
+search=
+status=
+city=
+state=
+sort=newest
+page=1
+limit=20
+
+Example response:
+
+{
+  success: true,
+  role: "buyer",
+  summary: {
+    total: 200,
+    pastMonth: 94,
+    locations: 3
+  },
+  pagination: {
+    page: 1,
+    limit: 20,
+    totalRecords: 200,
+    totalPages: 10
+  },
+  records: [
+    {
+      publicId: "B100001",
+      role: "buyer",
+      name: "Shyam",
+      businessName: "",
+      city: "Sonbhadra",
+      state: "Uttar Pradesh",
+      joinedAt: "2026-09-28T10:30:00.000Z",
+      status: "active",
+      phoneVerified: true
+    }
+  ]
+}
+
+For Admin records, return:
+
+summary: {
+  total: 4,
+  active: 4,
+  superAdmins: 1
+}
+
+The frontend must not calculate platform-wide totals from only the loaded page. Summary metrics must come from the backend.
+
+VISUAL POLISH
+
+Give extra attention to:
+
+- Strong hero header
+- Attractive role tabs
+- Elegant statistic cards
+- Premium record cards
+- Small animated hover transitions
+- Smooth filter changes
+- Skeleton loaders
+- Status pills
+- Role-specific accent colors
+- Clear press feedback
+- Soft background gradients
+- Beautiful empty states
+- Thoughtful typography
+- Balanced white space
+
+Avoid:
+
+- Generic Bootstrap table design
+- Harsh grey borders
+- Overcrowded rows
+- Tiny unreadable text
+- Excessive gradients
+- Excessive animation
+- Full-width desktop table forced onto mobile
+- Large unused white areas
+- Hidden page scrolling
+- Horizontal overflow
+
+DESIGN REFERENCE
+
+Take strong visual reference from the existing StoneRate Admin Rate Requests page.
+
+The new page should feel like the same product family:
+
+- Same spacing rhythm
+- Same typography hierarchy
+- Same orange accent
+- Same card radius
+- Same shadow style
+- Same filter-chip language
+- Same mobile responsiveness
+- Same premium operational interface quality
+
+Do not copy Rate Requests blindly. Adapt the style specifically for a large user directory and partner-management experience.
+
+EXPECTED COMPONENT PROPS
+
+StoneRateAdminUsersPartners should accept:
+
+{
+  onBack,
+  onNewRegistration,
+  onViewUserDetails,
+  initialRole = "buyer"
+}
+
+Optional:
+
+{
+  currentAdmin,
+  onRefresh
+}
+
+EXPECTED OUTPUT
+
+Provide:
+
+1. Complete React component
+2. All styles required by the component
+3. API helper functions
+4. Loading state
+5. Error state
+6. Empty state
+7. Responsive table and mobile cards
+8. Search and sorting
+9. Role filters
+10. Summary statistics
+11. Load More pagination
+12. View Details callback
+13. New Registration callback
+14. Clear comments explaining major sections
+15. No placeholder business logic that breaks production paths
+
+Do not alter unrelated Buyer, Seller, Sand Seller, Transporter, order, bidding, quotation, or delivery routes.
+
+The page must be production-oriented, visually stunning, responsive, secure, and consistent with the StoneRate Admin Rate Requests design.
