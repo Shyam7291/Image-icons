@@ -1,0 +1,1539 @@
+Create a new responsive StoneRate Admin page named:
+
+StoneRateAdminUserPartnerDetails.js
+
+PAGE PURPOSE
+
+This page opens when an Admin clicks “View Details” on a record inside:
+
+StoneRateAdminUsersPartners.js
+
+The page must display the complete Admin-authorized profile and operational history of the selected:
+
+1. Buyer
+2. Stone Seller
+3. Sand Seller
+4. Transporter
+5. Admin
+
+The page must also allow authorized Admin users to:
+
+- Review identity and Admin verification status
+- Verify an account where applicable
+- View role-specific business information
+- Search the user’s latest orders
+- Copy public Request, Delivery, and Transport IDs
+- Block an account through double confirmation
+- Unblock a blocked account
+- Start a highly protected account-deletion workflow
+- Review deleted-account status without exposing removed personal information
+
+IMPORTANT DESIGN DIRECTION
+
+Focus heavily on visual quality.
+
+The page must be:
+
+- Attractive
+- Stunning
+- Professional
+- Premium
+- Operationally clear
+- Mobile responsive
+- Easy to scan
+- Consistent with the existing StoneRate Admin interface
+
+Use the existing:
+
+StoneRateAdminUsersPartners.js
+
+as the primary design and theme reference.
+
+Match its visual language:
+
+- Warm ivory or off-white background
+- StoneRate orange accent
+- Dark navy text
+- Soft grey secondary text
+- Rounded cards
+- Thin warm borders
+- Premium but subtle shadows
+- Compact uppercase labels
+- Status pills
+- Role-specific colors
+- Clean dividers
+- Smooth hover and press states
+- Sticky controls only where useful
+- Good spacing
+- Strong visual hierarchy
+
+Do not create a generic Bootstrap profile page.
+
+Do not use tiny fonts.
+
+Use reasonable, readable content sizes on mobile and desktop:
+
+- Main title: approximately 22 to 30 px
+- Section titles: approximately 17 to 21 px
+- Card titles: approximately 14 to 17 px
+- Standard content: approximately 13 to 15 px
+- Supporting text: approximately 11 to 13 px
+- Small uppercase labels: approximately 10 to 12 px
+- Buttons: approximately 13 to 15 px
+
+All important profile values, phone numbers, IDs, status labels, order values, and actions must remain easily readable.
+
+COMPONENT PROPS
+
+The page should accept:
+
+{
+  selectedUser,
+  selectedRole,
+  onBack,
+  onRefresh,
+  onAccountUpdated,
+  onOpenOrder,
+  currentAdmin
+}
+
+The selected user may initially contain only a public ID and summary data. The page must then load the full profile from the backend.
+
+Example:
+
+{
+  selectedRole: "transporter",
+  selectedUser: {
+    publicId: "T100003",
+    name: "Shyam"
+  }
+}
+
+RECOMMENDED PAGE FLOW
+
+Display sections in this order:
+
+1. Header
+2. Identity and account-status hero
+3. Aadhaar and Admin verification cards
+4. Main profile details
+5. Full registered address and navigation
+6. Role-specific information
+7. Latest orders and search
+8. Account-management section
+9. Block, Unblock, or Delete controls
+10. Confirmation modals
+
+PAGE HEADER
+
+Create a premium header matching StoneRateAdminUsersPartners.js.
+
+Header content:
+
+- Back button
+- Uppercase eyebrow:
+  USER & PARTNER DETAILS
+
+- Main title based on role:
+  Buyer Profile
+  Stone Seller Profile
+  Sand Seller Profile
+  Transporter Profile
+  Admin Profile
+
+- Public ID pill
+- Refresh button
+- Role badge
+
+Examples:
+
+TRANSPORTER PROFILE
+Shyam
+T100003
+
+or:
+
+SAND SELLER PROFILE
+Shyam
+S100003
+
+Use a role-specific accent:
+
+- Buyer: Blue
+- Stone Seller: Orange
+- Sand Seller: Amber or golden
+- Transporter: Green or teal
+- Admin: Purple or dark navy
+
+IDENTITY HERO CARD
+
+Add a visually prominent identity card beneath the header.
+
+Show:
+
+- Circular initials avatar
+- Full registered name
+- Public ID
+- Role
+- Shop, plant, yard, or agency name
+- Joined date
+- Current account status
+
+Example:
+
+SH
+
+Shyam
+Transporter
+
+Shyam Yards
+ID: T100003
+Joined: 28 September 2026
+
+ACTIVE
+
+The status badge must support:
+
+- ACTIVE
+- PENDING
+- BLOCKED
+- SUSPENDED
+- DELETED
+
+Use clear status colors:
+
+- Active: Green
+- Pending: Amber
+- Blocked: Red
+- Suspended: Dark orange
+- Deleted: Grey
+
+The identity hero should look polished and match the Users & Partners page.
+
+TOP VERIFICATION SECTION
+
+Directly beneath the identity card, show two prominent verification cards.
+
+Card 1:
+
+AADHAAR
+Verified
+
+Card 2:
+
+ADMIN VERIFICATION
+Verified
+
+Example:
+
+Aadhaar
+✓ Verified
+
+Admin
+✓ Verified
+
+If Admin verification is pending, show:
+
+Admin Verification
+Pending
+
+[ Verify Account ]
+
+The verification action must not rely only on frontend state.
+
+Clicking Verify Account should open a confirmation modal:
+
+Verify this account?
+
+You are confirming that the account and submitted registration information have been reviewed by StoneRate Admin.
+
+Buttons:
+
+Cancel
+Verify Account
+
+While processing:
+
+Verify Account
+→ Verifying...
+
+After success:
+
+Admin Verification
+✓ Verified
+
+AADHAAR PRIVACY
+
+Do not display a full Aadhaar number or full Aadhaar-card image in the standard profile page.
+
+Show only:
+
+- Aadhaar verification status
+- Masked final four digits when available
+
+Example:
+
+Aadhaar
+XXXX XXXX 4827
+Verified
+
+Never expose:
+
+- Full Aadhaar number
+- Aadhaar OTP
+- Unmasked Aadhaar data
+- Authentication documents through public URLs
+
+If document review is later required, it must use a separate secure and audited document-review workflow.
+
+PROFILE INFORMATION SECTION
+
+Create a section titled:
+
+PROFILE INFORMATION
+
+Show details in responsive cards or a structured information grid.
+
+Common fields:
+
+- Public ID
+- Full name
+- Account type
+- Shop, Plant, Yard, or Agency name
+- Joining date
+- Primary mobile number
+- Alternate mobile number
+- Email ID
+- Aadhaar verification status
+- Masked Aadhaar ending
+- GSTIN, where applicable
+- Account status
+- Phone verification status
+- Admin verification status
+- Last updated date
+
+Use role-aware business labels:
+
+Buyer:
+Shop Name
+
+Stone Seller:
+Plant or Business Name
+
+Sand Seller:
+Sand Yard Name
+
+Transporter:
+Agency Name
+
+Admin:
+Admin Role
+
+PHONE ACTIONS
+
+Show phone numbers in readable form:
+
++91 98765 43210
+
+Provide actions:
+
+- Copy Phone
+- Call
+
+Do not allow accidental calls when clicking the surrounding card.
+
+If alternate phone is missing, show:
+
+Not provided
+
+EMAIL ACTION
+
+Show:
+
+- Email address
+- Copy Email action
+
+If email is missing:
+
+Not provided
+
+GSTIN
+
+Show GSTIN only for roles where it is available.
+
+Example:
+
+GSTIN
+09ABCDE1234F1Z5
+
+Add:
+
+Copy GSTIN
+
+Do not show a blank GSTIN card for Buyers or Admins unless the role supports it.
+
+FULL REGISTERED ADDRESS
+
+Create a separate premium section:
+
+REGISTERED ADDRESS
+
+Show:
+
+- Full address
+- City
+- State
+- Pincode
+
+Example:
+
+Shyam Yards
+Robertsganj Road
+Sonbhadra
+Uttar Pradesh
+231216
+
+Add an action button:
+
+Navigate
+
+The Navigate button should open Google Maps using:
+
+1. Saved latitude and longitude when both are available
+2. Otherwise, the complete registered address
+
+Use a properly encoded maps search query.
+
+Do not print coordinates visibly unless required.
+
+ROLE-SPECIFIC INFORMATION
+
+The page must adapt to the selected role.
+
+BUYER DETAILS
+
+Optionally show:
+
+- Shop name
+- Registered categories
+- Total requests
+- Active orders
+- Delivered orders
+- Delivery availability
+
+STONE SELLER DETAILS
+
+Show:
+
+- Plant or business name
+- Seller product type
+- Material categories
+- Daily production, if available
+- GSTIN
+- Account status
+- Admin verification
+- Aadhaar verification
+
+SAND SELLER DETAILS
+
+Create a prominent section:
+
+BUCKET CONVERSION INFORMATION
+
+Show every saved Sand material conversion.
+
+Example:
+
+Morang (Mota)
+
+1 bucket = 23 feet
+
+Additional examples:
+
+M-Sand
+1 bucket = 21.5 feet
+
+River Sand
+1 bucket = 24 feet
+
+Each conversion card should show:
+
+- Material name
+- Cubic feet per bucket
+- Last updated date, if available
+- Active or unavailable state
+
+Use the existing source of truth:
+
+seller_sand_bucket_information
+
+and join it with:
+
+sand_material_catalogue
+
+Do not calculate or invent conversion values in the frontend.
+
+If no conversion exists, show:
+
+No bucket conversion information has been saved.
+
+TRANSPORTER DETAILS
+
+Create two role-specific sections.
+
+Section 1:
+
+REGISTERED TRUCKS
+
+Show each truck type and count.
+
+Example:
+
+Truck Type
+10-Wheeler
+
+Count
+4 trucks
+
+Additional examples:
+
+6-Wheeler
+2 trucks
+
+12-Wheeler
+3 trucks
+
+Use cards or a compact, responsive table.
+
+Display:
+
+- Truck type
+- Truck count
+- Total fleet count
+
+Use the live source:
+
+transporter_trucks
+
+Section 2:
+
+REGISTERED OPERATING CITIES
+
+Show all registered cities.
+
+Example:
+
+Registered Cities
+
+Bengaluru
+Mysuru
+Tumakuru
+
+Use the live source:
+
+transporter_city_registrations
+
+Display city chips or compact city cards.
+
+Show:
+
+- City name
+- Total registered cities
+
+Do not display an incorrect state if the city-registration table does not store state.
+
+ADMIN DETAILS
+
+Show:
+
+- Admin role
+- Active status
+- Phone verification
+- Last login, if available
+- Joined date
+
+Restrict sensitive Admin actions according to the current Admin’s permissions.
+
+An Admin must not be able to delete or block the currently signed-in Admin account from this page.
+
+ORDERS SECTION
+
+Create a major section:
+
+LATEST ORDERS
+
+Add a search bar at the top.
+
+Placeholder:
+
+Search by material, quantity, date, Request ID, Delivery ID, or Transport ID
+
+Search must support:
+
+- Material name
+- Quantity
+- Order date
+- Public Request ID
+- Public Delivery ID
+- Public Transport ID
+
+Do not search only the ten currently loaded rows.
+
+Search should be performed by the backend against all orders associated with that account.
+
+ORDER COLUMNS
+
+Display only the requested essential information:
+
+- Order Date
+- Material
+- Quantity
+- Request ID
+- Delivery ID
+- Transport ID
+- Action
+
+Suggested desktop header:
+
+ORDER DATE
+MATERIAL
+QUANTITY
+REQUEST ID
+DELIVERY ID
+TRANSPORT ID
+ACTION
+
+Example row:
+
+28 Sep 2026
+Morang
+2,100 feet
+SR-260928-022
+SD-260928-022
+STO-260928-014
+View
+
+ID COPY ACTIONS
+
+Every ID should have a copy button.
+
+Example:
+
+SR-260928-022 [Copy]
+
+SD-260928-022 [Copy]
+
+STO-260928-014 [Copy]
+
+After copying, show compact feedback:
+
+Copied
+
+The copied value must be the complete underlying ID.
+
+If one ID is unavailable, display:
+
+Not assigned
+
+Do not display:
+
+undefined
+null
+empty pill
+
+QUANTITY DISPLAY
+
+Display the correct unit from the stored order data.
+
+Examples:
+
+2,100 feet
+22 tons
+50 buckets
+
+Do not assume every order uses tons.
+
+MOBILE ORDER DESIGN
+
+Do not force a wide desktop table onto mobile.
+
+On narrow screens, convert each order into a card:
+
+28 Sep 2026
+
+Morang
+2,100 feet
+
+Request ID
+SR-260928-022 [Copy]
+
+Delivery ID
+SD-260928-022 [Copy]
+
+Transport ID
+STO-260928-014 [Copy]
+
+[ View Order ]
+
+ORDER PAGINATION
+
+Initially load only the latest ten orders.
+
+Request:
+
+page=1
+limit=10
+
+If more than ten records exist, show:
+
+Showing 10 of 37 orders
+
+[ Load More ]
+
+When Load More is clicked:
+
+- Load the next ten records
+- Append them to the existing records
+- Prevent duplicate orders
+- Preserve the current search
+- Preserve the selected role and user
+- Show “Loading...” inside the button
+- Disable repeated clicks while loading
+
+If the next page has no records, hide the Load More button.
+
+ORDER SORTING
+
+Default order:
+
+Newest order first
+
+The backend should sort by order date descending.
+
+SEARCH DEBOUNCE
+
+Debounce search by approximately 300 to 500 milliseconds.
+
+When the search changes:
+
+- Reset page to 1
+- Clear the current list
+- Load the first ten matching orders
+- Do not append to the old search results
+
+ORDER EMPTY STATE
+
+If no orders exist:
+
+No orders found for this account.
+
+If search has no matches:
+
+No orders match your search.
+
+Include a clear search reset action.
+
+VIEW ORDER ACTION
+
+Each order can have:
+
+View Order
+
+Call:
+
+onOpenOrder({
+  userRole: selectedRole,
+  publicId: selectedUser.publicId,
+  order
+})
+
+Do not automatically assume that every role opens the same order-details page.
+
+ACCOUNT MANAGEMENT SECTION
+
+At the bottom, create a visually separated section:
+
+ACCOUNT MANAGEMENT
+
+Use a neutral card with a red-accented danger area.
+
+Show:
+
+- Current account status
+- Block or Unblock action
+- Delete Account action
+
+Do not show destructive actions as ordinary primary buttons.
+
+Use:
+
+- Block Account: Orange-red outline
+- Delete Account: Solid red
+- Unblock Account: Green outline
+
+BLOCK ACCOUNT WORKFLOW
+
+If the account is Active, show:
+
+Block Account
+
+Blocking must require double confirmation.
+
+FIRST CONFIRMATION
+
+Title:
+
+Block this account?
+
+Message:
+
+The account will lose access to StoneRate. Existing operational and transaction records will remain preserved.
+
+Require an optional or mandatory reason:
+
+Reason for blocking
+
+Buttons:
+
+Cancel
+Continue
+
+SECOND CONFIRMATION
+
+Title:
+
+Confirm account block
+
+Message:
+
+This action will immediately prevent the account from signing in and using StoneRate.
+
+Buttons:
+
+Go Back
+Block Account
+
+While processing:
+
+Blocking...
+
+After success:
+
+- Refresh account details
+- Change status to BLOCKED
+- Replace Block Account with Unblock Account
+- Display a success toast
+- Record the action in an Admin audit log
+
+BLOCKING RULES
+
+- Do not delete orders
+- Do not delete delivery records
+- Do not delete payment or quotation history
+- Do not delete vehicle history
+- Do not delete required audit information
+- Revoke active sessions where supported
+- Prevent future authentication
+- Store blocked timestamp
+- Store blocking Admin ID
+- Store the reason
+
+UNBLOCK ACCOUNT WORKFLOW
+
+If status is Blocked, show:
+
+Unblock Account
+
+Require confirmation:
+
+Restore this account?
+
+The account will regain access to StoneRate after confirmation.
+
+Buttons:
+
+Cancel
+Unblock Account
+
+While processing:
+
+Unblocking...
+
+After success:
+
+Status becomes:
+
+ACTIVE
+
+Record the unblocking Admin and timestamp in the audit log.
+
+ACCOUNT DELETION SAFETY
+
+The Delete Account workflow is highly destructive.
+
+Do not perform immediate physical deletion from the first button click.
+
+Do not delete records required for:
+
+- Orders
+- Deliveries
+- Quotations
+- Transport assignments
+- Disputes
+- Financial records
+- Security audits
+- Legal or regulatory retention
+- Fraud prevention
+
+Use controlled deletion and anonymization where complete database deletion would break relational history or business records.
+
+The final outcome required by the interface is:
+
+- Personal profile information removed or anonymized
+- Authentication disabled
+- Account status set to deleted
+- Only the minimum required mobile reference retained, if permitted
+- Historical order integrity preserved with an anonymized account reference
+- Audit log preserved
+
+The list and details page for a deleted account should show only:
+
+Mobile Number
+Status: Deleted
+
+Do not display deleted personal data such as:
+
+- Name
+- Email
+- Full address
+- Aadhaar data
+- GSTIN
+- Alternate phone
+- Profile image
+- Business information
+
+FIRST DELETE WARNING
+
+When Delete Account is clicked, open:
+
+Delete this account?
+
+Message:
+
+This is a destructive action. Personal profile and account-access data will be removed or anonymized. Historical records required for operational, audit, financial, support, fraud-prevention, or legal purposes may be retained in protected form.
+
+Show a summarized impact list:
+
+- Account login will be permanently disabled
+- Name and profile details will be removed
+- Email and alternate phone will be removed
+- Address will be removed
+- Aadhaar reference will be removed
+- GSTIN and business profile will be removed where allowed
+- Active sessions will be revoked
+- Order history will be anonymized where retention is required
+- This action cannot be reversed
+
+Require the Admin to type:
+
+DELETE
+
+Enable Proceed only when the entered text exactly matches:
+
+DELETE
+
+Buttons:
+
+Cancel
+Proceed
+
+ADMIN OTP VERIFICATION
+
+After clicking Proceed, request a six-digit OTP for the currently signed-in Admin.
+
+The OTP must be sent to the current Admin’s registered phone number.
+
+Do not send the OTP to the account being deleted.
+
+Open a six-digit OTP form:
+
+Security Verification
+
+A six-digit verification code was sent to the registered Admin phone ending in 4827.
+
+OTP fields:
+
+[ ] [ ] [ ] [ ] [ ] [ ]
+
+Required features:
+
+- Numeric input only
+- Paste support
+- Automatic focus movement
+- Backspace navigation
+- Resend control
+- Expiry handling
+- Attempt limit
+- Processing state
+- Clear error messages
+
+Button:
+
+Verify OTP
+
+While checking:
+
+Verifying...
+
+Do not place the OTP in frontend code, logs, query parameters, or browser storage.
+
+FINAL DELETE CONFIRMATION
+
+After successful OTP verification, show a final confirmation popup:
+
+Final account deletion confirmation
+
+Message:
+
+Admin verification was successful. Confirm permanent deletion and anonymization of this account.
+
+Show:
+
+Account ID
+Role
+Current status
+Mobile number
+Deletion impact summary
+
+Buttons:
+
+Cancel Deletion
+Permanently Delete Account
+
+Use a strong red warning design.
+
+While deleting:
+
+Deleting Account...
+
+After success:
+
+- Close the modal
+- Refresh the details page
+- Clear sensitive profile state immediately
+- Display only the retained mobile number
+- Set status to DELETED
+- Disable all further profile edits
+- Hide Block and Verify actions
+- Hide orders if the chosen privacy policy does not allow linking them visibly
+- Show an audit reference ID for the Admin action
+- Return a success message
+
+Example deleted state:
+
+ACCOUNT DELETED
+
+Mobile Number
++91 98765 43210
+
+Status
+DELETED
+
+All personal profile information has been removed.
+
+Audit Reference
+AUD-261002-0041
+
+DELETION BACKEND TRANSACTION
+
+Perform the final deletion in one database transaction.
+
+The backend should:
+
+1. Lock the account row.
+2. Verify the current status.
+3. Verify Admin permission.
+4. Verify the recent deletion OTP authorization.
+5. Prevent deletion of the current signed-in Admin.
+6. Revoke active sessions.
+7. Anonymize or remove allowed personal data.
+8. Remove role-specific non-retained profile data.
+9. Set account status to deleted.
+10. Store deleted_at.
+11. Store deleted_by_admin_id.
+12. Store the deletion audit reference.
+13. Preserve required relational records.
+14. Commit only if every required operation succeeds.
+15. Roll back on any failure.
+
+Do not run partial deletion operations outside the transaction.
+
+DELETE ROLE-SPECIFIC DATA
+
+BUYER
+
+Evaluate and safely anonymize:
+
+- Name
+- Shop name
+- Email
+- Alternate phone
+- Aadhaar reference
+- Address
+- City
+- State
+- Pincode
+- Categories
+- Profile-related data
+
+Preserve required order references in anonymized form.
+
+STONE SELLER
+
+Evaluate and safely anonymize:
+
+- Name
+- Plant name
+- Email
+- Alternate phone
+- Aadhaar reference
+- Address
+- Location
+- GSTIN where deletion is permitted
+- Profile photo
+- Seller categories
+- Non-required sample profile data
+
+Do not break historical accepted quotation or order snapshots.
+
+SAND SELLER
+
+Also handle:
+
+- Sand material profile
+- Bucket conversion information
+- Sand Yard profile
+- Active samples
+- Queue-related account access
+
+Do not remove immutable order snapshots required for completed transactions.
+
+TRANSPORTER
+
+Also handle:
+
+- Agency information
+- Registered trucks
+- Registered operating cities
+- Profile photo
+- Availability profile
+- Active account access
+
+Do not delete delivery or vehicle-history records required by existing orders.
+
+ADMIN
+
+Use much stronger restrictions.
+
+Only a Super Admin may delete another Admin account.
+
+Do not allow:
+
+- Self-deletion
+- Deletion of the final active Super Admin
+- Deletion without OTP
+- Deletion without audit logging
+
+ADMIN PERMISSION RULES
+
+Define permission levels such as:
+
+- Admin
+- Super Admin
+
+Suggested permissions:
+
+Admin:
+- View directory
+- View account details
+- Verify standard accounts
+- Block standard accounts
+- Unblock standard accounts
+
+Super Admin:
+- All Admin permissions
+- Delete standard accounts
+- Manage Admin accounts
+- Verify or block Admin accounts
+- Delete eligible Admin accounts
+
+Backend permissions are the source of truth.
+
+Do not rely only on hidden frontend buttons.
+
+RECOMMENDED API ENDPOINTS
+
+LOAD PROFILE
+
+GET /api/admin/users-partners/:role/:publicId
+
+Response:
+
+{
+  success: true,
+  record: {
+    publicId: "T100003",
+    role: "transporter",
+    name: "Shyam",
+    businessName: "Shyam Yards",
+    joinedAt: "2026-09-28T10:30:00.000Z",
+    phone: "9876543210",
+    alternatePhone: "9876500000",
+    email: "example@domain.com",
+    aadhaarVerified: true,
+    aadhaarLast4: "4827",
+    adminVerified: true,
+    gstin: "09ABCDE1234F1Z5",
+    address: "Registered address",
+    city: "Sonbhadra",
+    state: "Uttar Pradesh",
+    pincode: "231216",
+    status: "active",
+    trucks: [
+      {
+        truckType: "10-Wheeler",
+        truckCount: 4
+      }
+    ],
+    registeredCities: [
+      "Bengaluru",
+      "Mysuru"
+    ],
+    bucketConversions: []
+  }
+}
+
+LOAD ORDERS
+
+GET /api/admin/users-partners/:role/:publicId/orders
+
+Query:
+
+search=
+page=1
+limit=10
+
+Response:
+
+{
+  success: true,
+  pagination: {
+    page: 1,
+    limit: 10,
+    totalRecords: 37,
+    totalPages: 4
+  },
+  records: [
+    {
+      id: "order-internal-id",
+      orderDate: "2026-09-28T10:30:00.000Z",
+      materialName: "Morang",
+      quantity: 2100,
+      quantityUnit: "feet",
+      requestId: "SR-260928-022",
+      deliveryId: "SD-260928-022",
+      transportId: "STO-260928-014"
+    }
+  ]
+}
+
+VERIFY ACCOUNT
+
+PATCH /api/admin/users-partners/:role/:publicId/verify
+
+BLOCK ACCOUNT
+
+POST /api/admin/users-partners/:role/:publicId/block
+
+Body:
+
+{
+  reason: "Admin-entered reason"
+}
+
+UNBLOCK ACCOUNT
+
+POST /api/admin/users-partners/:role/:publicId/unblock
+
+REQUEST DELETE OTP
+
+POST /api/admin/users-partners/:role/:publicId/delete/request-otp
+
+VERIFY DELETE OTP
+
+POST /api/admin/users-partners/:role/:publicId/delete/verify-otp
+
+Body:
+
+{
+  otp: "123456"
+}
+
+FINAL DELETE
+
+DELETE /api/admin/users-partners/:role/:publicId
+
+Body:
+
+{
+  deletionAuthorizationId: "temporary-server-issued-id",
+  confirmation: "DELETE"
+}
+
+The final endpoint must not accept only a raw OTP as sufficient authorization.
+
+Use a short-lived, server-side deletion authorization generated after OTP verification.
+
+ERROR STATES
+
+PROFILE LOAD ERROR
+
+Unable to load account details.
+
+[ Retry ]
+
+ORDER LOAD ERROR
+
+Unable to load order history.
+
+[ Retry ]
+
+ACTION ERROR
+
+Unable to complete this account action.
+
+Provide the backend message only when safe.
+
+LOADING STATES
+
+Use skeleton loaders for:
+
+- Identity card
+- Verification cards
+- Profile information
+- Role-specific information
+- Orders
+
+Buttons must show action-specific states:
+
+Verifying...
+Blocking...
+Unblocking...
+Sending OTP...
+Verifying OTP...
+Deleting Account...
+Loading More...
+
+EMPTY STATES
+
+No truck registrations:
+
+No trucks have been registered for this Transporter.
+
+No operating cities:
+
+No operating cities have been registered.
+
+No bucket conversion:
+
+No bucket conversion information has been saved.
+
+No orders:
+
+No orders found for this account.
+
+DELETED ACCOUNT STATE
+
+If status is deleted, do not load or render removed profile fields.
+
+Render a dedicated deleted-account view containing only:
+
+- Retained mobile number
+- Deleted status
+- Deleted date, if policy permits
+- Audit reference
+- Back button
+
+Do not accidentally render stale profile information from React state after deletion.
+
+AUDIT LOGGING
+
+Every sensitive action should create an audit record:
+
+- Account verification
+- Account block
+- Account unblock
+- Delete OTP request
+- Delete OTP verification
+- Final account deletion
+
+Store:
+
+- Action type
+- Target public ID
+- Target role
+- Current Admin public ID
+- Timestamp
+- Reason
+- Previous status
+- New status
+- Audit reference
+- Request metadata where appropriate
+
+Do not store OTP values.
+
+RESPONSIVE DESIGN
+
+DESKTOP
+
+Use a two-column layout where suitable:
+
+Left:
+- Identity
+- Verification
+- Profile details
+- Address
+- Role-specific information
+
+Right:
+- Status
+- Key counts
+- Account management
+
+Orders should use a full-width section below.
+
+MOBILE
+
+Use a single-column layout.
+
+Ensure:
+
+- No horizontal page overflow
+- No fixed-width order table
+- Buttons remain tappable
+- Profile values wrap correctly
+- IDs remain copyable
+- Modal content scrolls
+- Bottom actions do not cover page content
+- Reasonable font sizes remain readable
+
+SCROLLING
+
+Do not use global:
+
+html,
+body,
+#root {
+  overflow: hidden;
+}
+
+Do not use:
+
+height: 100vh;
+overflow: hidden;
+
+on the main page wrapper.
+
+Use:
+
+min-height: 100vh;
+height: auto;
+overflow-x: hidden;
+
+Modal overlays may lock background scrolling only while open and must restore the previous overflow value during cleanup.
+
+DESIGN DETAILS
+
+Make the page visually exceptional using:
+
+- Warm background gradients
+- Premium identity card
+- Role-specific avatar color
+- Verification badges
+- Soft shadows
+- Clean information cards
+- Distinct order-history section
+- Elegant ID copy controls
+- Clear account-status presentation
+- Carefully separated danger zone
+- High-quality confirmation modals
+- Smooth hover and press transitions
+- Restrained animation
+- Strong typography hierarchy
+
+Avoid:
+
+- Tiny text
+- Harsh red areas across the entire page
+- Generic HTML tables
+- Excessive gradients
+- Crowded profile information
+- Unlabeled icons
+- Accidental destructive actions
+- Weak confirmation dialogs
+- Frontend-only permission checks
+- Displaying complete Aadhaar information
+- Destroying operational records without retention checks
+
+FILES TO CREATE OR UPDATE
+
+Create:
+
+frontend/src/pages/StoneRateAdminUserPartnerDetails.js
+
+Update:
+
+frontend/src/pages/StoneRateAdminUsersPartners.js
+frontend/src/App.js
+frontend/src/api/adminApi.js
+backend/src/routes/admin.routes.js
+backend/src/initDatabase.js
+
+Optional supporting components:
+
+frontend/src/components/AdminUserIdentityCard.js
+frontend/src/components/AdminUserOrders.js
+frontend/src/components/AdminAccountDangerZone.js
+frontend/src/components/AdminOtpInput.js
+
+Do not split the page unnecessarily if this project currently prefers page-level components.
+
+EXPECTED OUTPUT
+
+Provide:
+
+1. Complete React detail component
+2. Complete responsive styles
+3. Profile API helper
+4. Order-history API helper
+5. Verify helper
+6. Block helper
+7. Unblock helper
+8. Delete OTP request helper
+9. Delete OTP verification helper
+10. Final delete helper
+11. Complete backend routes
+12. Required database migrations
+13. Audit-log support
+14. Loading states
+15. Error states
+16. Empty states
+17. Copy-ID functionality
+18. Navigation functionality
+19. Search and Load More
+20. Secure destructive-action workflow
+21. App.js routing
+22. View Details connection from StoneRateAdminUsersPartners.js
+23. Syntax-valid, production-oriented code
+
+Do not modify unrelated Buyer, Seller, Sand Seller, Transporter, quotation, bidding, sample, or delivery functionality.
