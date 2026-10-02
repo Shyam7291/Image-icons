@@ -1,0 +1,1289 @@
+Create a new responsive StoneRate Admin page named:
+
+StoneRateAdminBuyerVerification.js
+
+PAGE PURPOSE
+
+This page allows an authorized StoneRate Admin to review and decide a Buyer’s business-verification submission.
+
+The Buyer will submit:
+
+1. Aadhaar verification status from the approved Aadhaar verification provider
+2. A live photograph of the shop frontage or hoarding
+3. A live selfie captured in front of the same shop hoarding
+4. Coordinates captured during the shop photograph
+5. Coordinates captured during the selfie
+6. Location accuracy in metres
+7. Capture timestamps
+8. Registered Buyer and shop information
+
+The Admin uses this information to assess whether:
+
+- The Buyer’s identity has been verified
+- The submitted business appears connected to the Buyer
+- The shop name or hoarding is visible
+- The two photographs appear to be taken at the same business location
+- The captured location is consistent with the registered business location
+- A new submission is required
+- The Buyer can be approved for commercial activity
+
+IMPORTANT TERMINOLOGY
+
+Keep these verification concepts separate:
+
+AADHAAR VERIFICATION
+
+Confirms the Buyer’s identity through the authorized Aadhaar provider.
+
+BUSINESS VERIFICATION
+
+Confirms that the Buyer has submitted adequate evidence of a construction-material shop or relevant commercial establishment.
+
+ACCOUNT STATUS
+
+Controls whether the account is:
+
+- Active
+- Restricted
+- Blocked
+- Deleted
+
+Do not use one field for all three concepts.
+
+PAGE ROUTE
+
+Suggested internal route:
+
+adminBuyerVerification
+
+The page should open from:
+
+Admin
+→ Users & Partners
+→ Buyers
+→ View Details
+→ Business Verification
+→ Review Submission
+
+It may also open from a future Admin verification queue.
+
+COMPONENT PROPS
+
+The component should accept:
+
+{
+  buyerPublicId,
+  selectedBuyer,
+  currentAdmin,
+  onBack,
+  onVerificationUpdated,
+  onNavigateToBuyerDetails
+}
+
+Example:
+
+{
+  buyerPublicId: "B100008",
+  selectedBuyer: {
+    publicId: "B100008",
+    name: "Naman Yadav",
+    businessName: "A to Z Enterprises"
+  }
+}
+
+DESIGN DIRECTION
+
+Give the page exceptional visual attention.
+
+The page must feel:
+
+- Attractive
+- Stunning
+- Premium
+- Modern
+- Trustworthy
+- Professional
+- Operationally clear
+- Suitable for sensitive identity and business review
+- Fully responsive on desktop, tablet, and mobile
+
+Take the primary theme reference from:
+
+StoneRateAdminUsersPartners.js
+
+Match its visual system:
+
+- Warm off-white or ivory background
+- StoneRate orange primary accent
+- Dark navy headings
+- Soft slate secondary text
+- Rounded white cards
+- Thin warm-grey borders
+- Premium subtle shadows
+- Compact uppercase eyebrow labels
+- Status badges
+- Blue accents for Buyer identity
+- Green accents for verified information
+- Amber accents for pending review
+- Red accents only for rejection and sensitive warnings
+- Clean spacing
+- Strong visual hierarchy
+- Smooth but restrained transitions
+
+Do not create a generic document-review page.
+
+Do not use tiny fonts.
+
+RECOMMENDED FONT SIZES
+
+Use reasonable and readable typography:
+
+- Page title: 24 to 30 px
+- Buyer name: 20 to 26 px
+- Section heading: 16 to 20 px
+- Card heading: 14 to 17 px
+- Standard information: 13 to 15 px
+- Supporting text: 11 to 13 px
+- Uppercase label: 10 to 12 px
+- Buttons: 13 to 15 px
+- Coordinates: 12 to 14 px in a monospaced style
+
+PAGE STRUCTURE
+
+Display the page in this order:
+
+1. Header
+2. Buyer identity summary
+3. Verification progress summary
+4. Aadhaar verification card
+5. Shop-front photograph review
+6. Selfie-with-shop review
+7. Location evidence
+8. Submission information
+9. Admin review notes
+10. Verification decision controls
+11. Review history
+12. Confirmation modals
+
+PAGE HEADER
+
+Create a premium sticky or semi-sticky page header.
+
+Show:
+
+- Back button
+- Uppercase eyebrow:
+  BUYER BUSINESS VERIFICATION
+
+- Main title:
+  Review Verification
+
+- Buyer public ID pill
+- Refresh button
+- Verification-status badge
+
+Example:
+
+BUYER BUSINESS VERIFICATION
+
+Review Verification
+
+B100008
+
+UNDER REVIEW
+
+The header must not block page scrolling.
+
+BUYER IDENTITY SUMMARY
+
+Create a prominent Buyer hero card.
+
+Show:
+
+- Initials avatar
+- Buyer name
+- Buyer public ID
+- Shop name
+- Primary mobile number
+- Registered city and state
+- Joined date
+- Account status
+- Business-verification status
+
+Example:
+
+NY
+
+Naman Yadav
+Buyer
+
+A to Z Enterprises
+
+Buyer ID
+B100008
+
+Registered location
+Sonbhadra, Uttar Pradesh
+
+Business Verification
+Under Review
+
+Do not expose unnecessary personal details in the hero area.
+
+VERIFICATION PROGRESS SUMMARY
+
+Create four attractive status cards:
+
+1. AADHAAR
+   Verified or Not Verified
+
+2. SHOP PHOTO
+   Submitted or Missing
+
+3. SELFIE WITH SHOP
+   Submitted or Missing
+
+4. LOCATION
+   Captured or Not Available
+
+Use a four-column layout on desktop.
+
+Use a two-column grid or horizontal scroll on smaller mobile screens.
+
+Each card should contain:
+
+- Icon
+- Compact uppercase label
+- Current status
+- Supporting description
+
+Example:
+
+AADHAAR
+Verified
+Identity verification completed
+
+LOCATION
+Captured
+Accuracy: 18 metres
+
+AADHAAR VERIFICATION CARD
+
+Create a secure Aadhaar-status card.
+
+Show:
+
+- Provider verification status
+- Masked Aadhaar number
+- Verification provider reference
+- Verification method
+- Verification date and time
+- Name-match result, if provided
+- Face-authentication or identity-match status, if provided
+
+Example:
+
+AADHAAR IDENTITY VERIFICATION
+
+Status
+Verified
+
+Aadhaar
+XXXX XXXX 4827
+
+Verification Method
+Face Authentication
+
+Name Match
+Successful
+
+Verified
+02 Oct 2026, 11:30 AM
+
+Provider Reference
+AVR-261002-0041
+
+Do not show the complete Aadhaar number in this standard review page.
+
+Do not provide a Copy Aadhaar button.
+
+Do not place Aadhaar information in page URLs, logs, analytics, local storage, or image metadata.
+
+If Aadhaar is not verified, clearly show:
+
+Aadhaar verification has not been completed.
+
+Admin must not manually mark Aadhaar as verified unless the approved provider returned a successful verification result.
+
+SHOP-FRONT PHOTOGRAPH SECTION
+
+Create a major visual card:
+
+SHOP-FRONT EVIDENCE
+
+Display the Buyer’s submitted live shop-front photograph.
+
+The image should show:
+
+- Complete storefront
+- Hoarding or signboard
+- Visible shop or business name
+- Immediate storefront surroundings
+
+Image-card features:
+
+- Large responsive preview
+- Open full image button
+- Zoom controls
+- Fit-to-screen control
+- Capture-source badge
+- Capture timestamp
+- Location-captured badge
+- Image-upload timestamp
+- Quality warning where applicable
+
+Example metadata:
+
+Capture Method
+Live Camera
+
+Captured
+02 Oct 2026, 10:42 AM
+
+Location
+Captured
+
+Location Accuracy
+18.4 metres
+
+Image Status
+Submitted
+
+ADMIN REVIEW CHECKLIST
+
+Below the shop image, show a review checklist:
+
+- Shop frontage is clearly visible
+- Shop name or hoarding is readable
+- Shop name matches the registered business name
+- The photograph appears current
+- The image provides sufficient business context
+- No major inconsistency is visible
+
+The checklist is for the reviewing Admin.
+
+Do not perform automatic identity or ownership conclusions solely from the image.
+
+Allow values:
+
+- Confirmed
+- Unclear
+- Not Confirmed
+
+SELFIE WITH SHOP SECTION
+
+Create a second major visual card:
+
+SELFIE WITH SHOP EVIDENCE
+
+Display the live selfie submitted by the Buyer.
+
+The image should ideally include:
+
+- Buyer’s submitted live selfie
+- Shop hoarding visible in the background
+- Adequate surrounding business context
+
+Show the same metadata structure:
+
+Capture Method
+Live Camera
+
+Captured
+02 Oct 2026, 10:45 AM
+
+Location
+Captured
+
+Accuracy
+14.7 metres
+
+Do not identify the person automatically from the photograph.
+
+Do not infer identity, personal traits, or any protected characteristic.
+
+Admin should compare the submission only against authorized verification information and business-registration data.
+
+SELFIE REVIEW CHECKLIST
+
+Show:
+
+- Selfie was captured using the live camera flow
+- Shop hoarding is visible in the background
+- Shop name appears consistent with the registered shop
+- Image quality is sufficient for review
+- No obvious upload mismatch is present
+- Additional verification is not required
+
+Allow:
+
+- Confirmed
+- Unclear
+- Not Confirmed
+
+IMAGE PRIVACY
+
+Both photographs are sensitive.
+
+Requirements:
+
+- Store them as private Cloudflare R2 objects
+- Use short-lived signed URLs for Admin viewing
+- Do not use permanent public image URLs
+- Do not expose the images to Sellers or Transporters
+- Do not include the image URLs in browser logs
+- Do not allow unauthenticated access
+- Do not include a public download button
+- Record every sensitive-image access where appropriate
+- Revoke or expire signed URLs automatically
+
+LOCATION EVIDENCE SECTION
+
+Create a section:
+
+CAPTURED LOCATION EVIDENCE
+
+Show two location cards:
+
+1. Shop Photograph Location
+2. Selfie Location
+
+Each card should display:
+
+- Latitude
+- Longitude
+- Accuracy in metres
+- Capture date and time
+- Location source
+- Permission status
+- Open Navigation button
+
+Example:
+
+SHOP PHOTO LOCATION
+
+Latitude
+25.123456
+
+Longitude
+82.123456
+
+Accuracy
+18.4 metres
+
+Captured
+02 Oct 2026, 10:42 AM
+
+Source
+Device foreground location
+
+[ Open Navigation ]
+
+SELFIE LOCATION
+
+Latitude
+25.123459
+
+Longitude
+82.123451
+
+Accuracy
+14.7 metres
+
+Captured
+02 Oct 2026, 10:45 AM
+
+Source
+Device foreground location
+
+[ Open Navigation ]
+
+LOCATION COMPARISON
+
+The backend should calculate the straight-line distance between:
+
+- Shop photo coordinates
+- Selfie coordinates
+
+Show:
+
+Distance Between Captures
+22 metres
+
+Use descriptive review guidance:
+
+- Locations appear consistent
+- Location difference requires review
+- Location evidence is incomplete
+
+Do not use location alone as final proof.
+
+Google Maps API is not required for capturing or storing the coordinates.
+
+The Open Navigation action may open an external maps URL using latitude and longitude.
+
+If location is unavailable, show:
+
+Location was not captured for this submission.
+
+Do not display:
+
+undefined
+null
+0, 0
+
+ACCURACY PRESENTATION
+
+Use clear accuracy labels:
+
+High Accuracy
+Up to 25 metres
+
+Moderate Accuracy
+26 to 100 metres
+
+Low Accuracy
+More than 100 metres
+
+These thresholds are product-design recommendations and should be configurable.
+
+Low-accuracy submissions should not be automatically rejected.
+
+Show:
+
+Location accuracy is low. Review the photographs and registered address carefully.
+
+REGISTERED BUSINESS COMPARISON
+
+Create a card:
+
+REGISTERED BUSINESS INFORMATION
+
+Show:
+
+- Buyer name
+- Shop name
+- Registered full address
+- City
+- State
+- Pincode
+- Registered coordinates, if already available
+- Submitted shop coordinates
+- Submitted selfie coordinates
+
+Highlight:
+
+Registered Shop
+A to Z Enterprises
+
+Submitted Hoarding
+A to Z Enterprises
+
+Comparison
+Appears consistent
+
+If automated text recognition is later introduced, mark it as machine-assisted and require Admin confirmation.
+
+Do not claim a match unless the Admin or validated system confirms it.
+
+SUBMISSION SUMMARY
+
+Create a section:
+
+SUBMISSION INFORMATION
+
+Show:
+
+- Verification Submission ID
+- Buyer ID
+- Submission status
+- Submitted date and time
+- Last updated date
+- Submission attempt number
+- Previous review status
+- Resubmission reason, if applicable
+- Current Admin reviewer
+- Review started date, if applicable
+
+Example:
+
+Submission ID
+BVS-261002-0014
+
+Attempt
+2
+
+Submitted
+02 Oct 2026, 10:46 AM
+
+Status
+Under Review
+
+Previous Result
+Resubmission Required
+
+ADMIN REVIEW NOTES
+
+Create a large review-notes card.
+
+Label:
+
+ADMIN REVIEW NOTE
+
+Placeholder:
+
+Record your review findings. Explain any mismatch, missing evidence, approval basis, or resubmission requirement.
+
+Notes must be mandatory for:
+
+- Request Resubmission
+- Reject Verification
+
+Notes should be recommended for:
+
+- Verify Buyer
+
+Minimum note length for rejection or resubmission:
+
+10 characters
+
+Maximum:
+
+1,500 characters
+
+Show character count.
+
+Do not remove older review notes.
+
+Preserve review history.
+
+ADMIN DECISION AREA
+
+Create a prominent panel:
+
+VERIFICATION DECISION
+
+Available actions:
+
+1. Verify Buyer
+2. Request Resubmission
+3. Reject Verification
+
+VERIFY BUYER
+
+Use a green primary action:
+
+Verify Buyer
+
+Clicking opens a confirmation modal:
+
+Verify Buyer Business?
+
+You are confirming that the submitted identity and business evidence has been reviewed and is sufficient for StoneRate Buyer activity.
+
+Summary:
+
+- Aadhaar verified
+- Shop photo reviewed
+- Selfie reviewed
+- Location evidence reviewed
+- Registered business details reviewed
+
+Buttons:
+
+Cancel
+Verify Buyer
+
+While processing:
+
+Verifying...
+
+After success:
+
+Business Verification
+Verified
+
+The Buyer may then create Rate Requests and accept quotations.
+
+REQUEST RESUBMISSION
+
+Use an amber action:
+
+Request Resubmission
+
+Open:
+
+Request New Verification Evidence
+
+Require Admin to select one or more reasons:
+
+- Shop hoarding is not visible
+- Shop name is not readable
+- Shop name does not match registration
+- Selfie background is unclear
+- Selfie quality is insufficient
+- Location was not captured
+- Location accuracy is poor
+- Shop and selfie locations appear inconsistent
+- Aadhaar verification is incomplete
+- Other
+
+Require an Admin note.
+
+Allow selection of the evidence that must be replaced:
+
+- Shop photo
+- Selfie with shop
+- Location
+- Aadhaar verification
+- Registered business information
+
+The Buyer should be able to replace only the rejected components.
+
+Buttons:
+
+Cancel
+Request Resubmission
+
+After success:
+
+Business Verification
+Resubmission Required
+
+REJECT VERIFICATION
+
+Use a red outline action:
+
+Reject Verification
+
+This action should require:
+
+- A selected rejection reason
+- Mandatory Admin note
+- Final confirmation
+
+Modal:
+
+Reject Buyer Verification?
+
+The Buyer’s current verification submission will be rejected. The Buyer cannot create new commercial requests unless a new submission is permitted and later approved.
+
+Buttons:
+
+Go Back
+Reject Verification
+
+Status after rejection:
+
+Rejected
+
+Do not automatically block or delete the Buyer account.
+
+BUSINESS VERIFICATION ACCESS RULE
+
+Buyer account status and business-verification status must remain separate.
+
+Example:
+
+Account Status
+Active
+
+Business Verification
+Under Review
+
+An Active but unverified Buyer can:
+
+- Sign in
+- View profile
+- View previous records
+- Contact Support
+- Submit verification
+
+An Active but unverified Buyer cannot:
+
+- Create a new Rate Request
+- Accept a quotation
+- Create a new commercial order
+
+A Verified Buyer can perform normal Buyer commercial actions.
+
+A Restricted account remains restricted even if business verification is approved.
+
+A Blocked account cannot sign in.
+
+REVIEW HISTORY
+
+Create a section:
+
+VERIFICATION REVIEW HISTORY
+
+Show a chronological timeline.
+
+Example:
+
+02 Oct 2026, 03:20 PM
+Resubmission Requested
+
+Reason:
+Shop hoarding was not clearly visible.
+
+Reviewed By:
+ADM-001
+
+01 Oct 2026, 11:10 AM
+Submission Received
+
+30 Sep 2026, 05:45 PM
+Verification Started
+
+Record:
+
+- Event
+- Status
+- Date and time
+- Admin ID
+- Admin note
+- Changed evidence
+- Audit reference
+
+Do not allow editing older history.
+
+LOADING STATES
+
+Use skeleton loaders for:
+
+- Buyer identity card
+- Verification status cards
+- Shop image
+- Selfie image
+- Location evidence
+- Submission details
+- Review history
+
+Buttons must show:
+
+Verifying...
+Requesting Resubmission...
+Rejecting...
+Refreshing...
+
+Disable repeated actions while processing.
+
+ERROR STATES
+
+PROFILE LOAD ERROR
+
+Unable to load Buyer verification.
+
+[ Retry ]
+
+IMAGE LOAD ERROR
+
+This verification image could not be loaded securely.
+
+[ Retry Image ]
+
+LOCATION ERROR
+
+Captured location information is unavailable.
+
+ACTION ERROR
+
+Unable to save the verification decision.
+
+Show the backend message only when safe.
+
+EMPTY STATES
+
+NO SUBMISSION
+
+Buyer has not submitted business-verification evidence.
+
+Missing:
+
+- Shop-front photograph
+- Selfie with shop
+- Captured location
+
+NO LOCATION
+
+Location was not captured for this verification submission.
+
+NO REVIEW HISTORY
+
+No Admin review has been recorded.
+
+MOBILE DESIGN
+
+Use a single-column layout on mobile.
+
+Ensure:
+
+- Images use the full available card width
+- Zoom controls remain accessible
+- Coordinates wrap safely
+- Action buttons remain large enough to tap
+- Confirmation modals scroll internally
+- Sticky actions do not cover content
+- No horizontal page overflow
+- Font sizes remain readable
+- Review checklists remain easy to use
+
+DESKTOP DESIGN
+
+Recommended layout:
+
+HEADER
+
+FULL-WIDTH BUYER HERO
+
+FOUR VERIFICATION STATUS CARDS
+
+TWO-COLUMN EVIDENCE GRID
+
+Left:
+- Shop-front evidence
+
+Right:
+- Selfie evidence
+
+Below:
+- Location evidence
+- Registered business comparison
+- Submission information
+- Admin notes
+- Decision panel
+- Review history
+
+On medium screens, stack the image cards vertically.
+
+SCROLLING
+
+Do not use:
+
+height: 100vh;
+overflow: hidden;
+
+on the page wrapper.
+
+Use:
+
+min-height: 100vh;
+height: auto;
+overflow-x: hidden;
+
+Lock background scrolling only while a modal is open and restore it during cleanup.
+
+ACCESSIBILITY
+
+- Every image must have descriptive alternative text
+- Do not use a person’s name as selfie alt text
+- Use:
+  Buyer-submitted selfie with shop hoarding in background
+
+- Buttons must have readable labels
+- Icons must not be the only indicator
+- Statuses must include text, not color alone
+- Modal focus must remain inside the modal
+- Escape or Cancel should close non-final dialogs
+- Provide visible keyboard focus
+- Review checkboxes must have semantic labels
+- Use sufficient color contrast
+
+RECOMMENDED DATA STRUCTURE
+
+{
+  submissionId: "BVS-261002-0014",
+  buyerPublicId: "B100008",
+  status: "under_review",
+  attemptNumber: 2,
+
+  buyer: {
+    name: "Naman Yadav",
+    shopName: "A to Z Enterprises",
+    phone: "9876543210",
+    address: "Registered address",
+    city: "Sonbhadra",
+    state: "Uttar Pradesh",
+    pincode: "231216",
+    accountStatus: "active"
+  },
+
+  aadhaar: {
+    verified: true,
+    last4: "4827",
+    providerReference: "AVR-261002-0041",
+    verificationMethod: "face_authentication",
+    nameMatch: true,
+    verifiedAt: "2026-10-02T06:00:00.000Z"
+  },
+
+  shopPhoto: {
+    privateObjectKey: "buyer-verification/...",
+    signedViewUrl: "...",
+    captureMethod: "live_camera",
+    capturedAt: "2026-10-02T05:12:00.000Z",
+    latitude: 25.123456,
+    longitude: 82.123456,
+    accuracyMeters: 18.4
+  },
+
+  selfiePhoto: {
+    privateObjectKey: "buyer-verification/...",
+    signedViewUrl: "...",
+    captureMethod: "live_camera",
+    capturedAt: "2026-10-02T05:15:00.000Z",
+    latitude: 25.123459,
+    longitude: 82.123451,
+    accuracyMeters: 14.7
+  },
+
+  locationComparison: {
+    distanceMeters: 22,
+    classification: "consistent"
+  },
+
+  submittedAt: "2026-10-02T05:16:00.000Z",
+  updatedAt: "2026-10-02T05:16:00.000Z",
+
+  latestReview: {
+    adminPublicId: null,
+    decision: null,
+    note: null,
+    reviewedAt: null
+  }
+}
+
+RECOMMENDED API ENDPOINTS
+
+LOAD VERIFICATION
+
+GET /api/admin/buyer-verifications/:buyerPublicId
+
+Response:
+
+{
+  success: true,
+  verification: { ... }
+}
+
+LOAD PRIVATE IMAGE URL
+
+POST /api/admin/buyer-verifications/:buyerPublicId/images/:imageType/view
+
+imageType:
+
+shop
+selfie
+
+The backend should return a short-lived signed URL.
+
+VERIFY BUYER
+
+POST /api/admin/buyer-verifications/:buyerPublicId/verify
+
+Body:
+
+{
+  note: "Submitted evidence reviewed and approved.",
+  checklist: {
+    shopVisible: true,
+    shopNameReadable: true,
+    shopNameConsistent: true,
+    selfieWithShopClear: true,
+    locationReviewed: true
+  }
+}
+
+REQUEST RESUBMISSION
+
+POST /api/admin/buyer-verifications/:buyerPublicId/request-resubmission
+
+Body:
+
+{
+  reasons: [
+    "shop_name_not_readable",
+    "selfie_background_unclear"
+  ],
+  replace: [
+    "shop_photo",
+    "selfie_photo"
+  ],
+  note: "Please upload photographs with the complete hoarding visible."
+}
+
+REJECT VERIFICATION
+
+POST /api/admin/buyer-verifications/:buyerPublicId/reject
+
+Body:
+
+{
+  reasons: [
+    "business_information_inconsistent"
+  ],
+  note: "Submitted business evidence does not match the registered shop details."
+}
+
+LOAD HISTORY
+
+GET /api/admin/buyer-verifications/:buyerPublicId/history
+
+BACKEND SECURITY
+
+Every endpoint must verify:
+
+- Signed-in Admin account
+- Admin account is active
+- Admin has the required permission
+- Buyer public ID is valid
+- Submission belongs to the Buyer
+- Signed image URL is short-lived
+- Review action is valid for the current state
+- Duplicate review submissions are prevented
+- Audit record is created
+- Sensitive images are never returned through public URLs
+
+Do not rely only on hidden frontend buttons.
+
+DATABASE TABLES
+
+Suggested table:
+
+buyer_business_verifications
+
+Fields:
+
+id
+public_verification_id
+buyer_id
+status
+attempt_number
+
+shop_image_object_key
+shop_capture_method
+shop_latitude
+shop_longitude
+shop_accuracy_meters
+shop_captured_at
+
+selfie_image_object_key
+selfie_capture_method
+selfie_latitude
+selfie_longitude
+selfie_accuracy_meters
+selfie_captured_at
+
+location_distance_meters
+
+admin_note
+reviewed_by_admin_id
+reviewed_at
+submitted_at
+created_at
+updated_at
+
+Suggested review-history table:
+
+buyer_business_verification_history
+
+Fields:
+
+id
+verification_id
+old_status
+new_status
+action
+reasons
+replace_components
+admin_note
+changed_by_admin_id
+audit_reference
+created_at
+
+Store reasons and replace-components as JSONB or arrays where appropriate.
+
+AUDIT REQUIREMENTS
+
+Log:
+
+- Verification viewed
+- Secure image URL requested
+- Verify action
+- Resubmission request
+- Rejection
+- Submission reopened
+- Status changes
+
+Do not log:
+
+- Full Aadhaar number
+- Raw Aadhaar authentication payload
+- Image binary data
+- Signed image URLs
+- Precise coordinates in general application logs
+
+PAGE FILE
+
+Create:
+
+frontend/src/pages/StoneRateAdminBuyerVerification.js
+
+Suggested route:
+
+adminBuyerVerification
+
+Connect it from:
+
+StoneRateAdminUserPartnerDetails.js
+
+Add a button visible for Buyer accounts:
+
+Review Business Verification
+
+Do not show this button for:
+
+- Stone Seller
+- Sand Seller
+- Transporter
+- Admin
+
+EXPECTED OUTPUT
+
+Provide:
+
+1. Complete React page
+2. Premium responsive styling
+3. Admin API helpers
+4. Backend Admin routes
+5. Required database initialization
+6. Secure signed-image access
+7. Coordinate display
+8. Navigate buttons
+9. Location-distance comparison
+10. Verification checklist
+11. Admin review notes
+12. Verify workflow
+13. Resubmission workflow
+14. Reject workflow
+15. Review history
+16. Loading states
+17. Error states
+18. Empty states
+19. Audit support
+20. App.js route connection
+21. Buyer-detail-page connection
+22. Syntax-valid production-oriented code
+
+Do not modify unrelated Buyer orders, Seller samples, Transporter bidding, quotation, delivery, or authentication workflows.
