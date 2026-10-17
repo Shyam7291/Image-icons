@@ -1,32 +1,277 @@
-Replace the demo notifications in StoneRate’s transporter notification drawer with real notifications for these events only:
+Implement Admin-assisted registration in StoneRate’s existing Users & Partners section.
 
-1. NEW BIDDING OPPORTUNITY
-Notify the transporter when a new bidding opportunity becomes available to that transporter.
+GOAL
+The existing “Register New Buyer” and equivalent buttons for Stone Seller, Sand Seller, and Transporter must work.
 
-2. ORDER ASSIGNED
-Notify the transporter when an order is assigned:
-- Through direct assignment.
-- Through winning a bid.
+Admin should be able to create an account on behalf of any of these four roles through a dedicated registration page, fill in the relevant profile information, and optionally mark the account as Admin-verified during registration.
 
-Clearly identify the assignment method and relevant order.
+Do not add Admin-account creation to this feature.
 
-3. TRANSPORTER’S OWN MATERIAL-REQUEST UPDATES
-For material orders requested by the transporter from sellers, notify the transporter when:
-- A seller accepts the request or a material within it.
-- A material or request is fully cancelled.
-- A material quantity is partially cancelled or reduced.
+1. INSPECT EXISTING IMPLEMENTATION FIRST
 
-For cancellations, identify the affected material, cancelled quantity, remaining quantity, recorded unit, and reason where available. Distinguish material-level changes from whole-request changes.
+Read the actual profile pages, registration flows, APIs, database tables, and verification logic for:
+- Buyer.
+- Stone Seller.
+- Sand Seller.
+- Transporter.
 
-DISPLAY REQUIREMENTS
-- Show the latest 60 notifications for the logged-in transporter, newest first.
-- Use real events only. Remove demo notifications.
-- Do not show another transporter’s notifications.
-- Avoid duplicate notifications for the same event.
-- Preserve read/unread state.
-- Clicking a notification should open the relevant bid, order, or material request.
-- Keep the existing notification drawer design.
-- Do not add payment, reminder, or other notification types.
+Also inspect:
+- Users & Partners directory.
+- Individual account-details pages.
+- Existing Admin verification actions.
+- Existing image/document upload services.
+- Navigation and route registration.
 
-CHANGE BOUNDARIES
-Make only the changes necessary to connect these notifications. Do not unnecessarily modify existing APIs, login/OTP, order processing, bidding rules, assignments, cancellation logic, or unrelated workflows.
+Use the existing profile fields, field names, validation rules, dropdown sources, and storage structure.
+
+Do not guess the required fields or create a second account system.
+
+2. CONNECT THE EXISTING REGISTER BUTTONS
+
+Each role’s existing Register button should open a dedicated registration page with the correct role selected.
+
+Examples:
+- Buyers → Register New Buyer.
+- Stone Sellers → Register New Stone Seller.
+- Sand Sellers → Register New Sand Seller.
+- Transporters → Register New Transporter.
+
+Use one reusable role-aware page if suitable, with role-specific form sections.
+
+The page should include:
+- Clear role-specific heading.
+- Back navigation.
+- Relevant profile sections.
+- Required-field indicators.
+- Existing dropdowns and upload controls.
+- Admin verification checkbox near the bottom.
+- Review and Create Account actions.
+
+Preserve the existing Users & Partners design.
+
+3. COLLECT THE SAME INFORMATION AS EXISTING PROFILES
+
+Inspect each role’s profile page and collect the same applicable information during Admin registration.
+
+This may include identity/contact information, business information, address, operating locations, documents, and role-specific details, but the actual source code must determine the exact fields.
+
+Preserve the distinction between:
+- Fields required to create an account.
+- Fields required for a complete profile.
+- Optional fields.
+
+Do not silently omit required role-specific data or introduce new mandatory fields without justification.
+
+Reuse existing Admin Settings dropdowns and reference data. Do not hard-code replacement lists.
+
+4. ADMIN VERIFICATION CHECKBOX
+
+Near the bottom, add:
+
+“Mark this account as Admin verified”
+
+Keep it unchecked by default.
+
+When checked:
+- Create the account with the existing Admin-verified status.
+- Save verifiedBy using the authenticated Admin identity.
+- Save verifiedAt using the server timestamp.
+- Record that verification occurred during Admin-assisted registration.
+- Do not require the same account to pass through the existing Admin verification queue again.
+
+When unchecked:
+- Create the account with the existing pending/unverified status.
+- Preserve the normal verification workflow.
+
+Use the same verification fields and rules already used by the application.
+
+IMPORTANT:
+Admin business/account verification is not automatically proof of phone ownership, email ownership, or document authenticity.
+
+Do not set phoneVerified or emailVerified merely because Admin checked this box.
+
+Do not bypass existing mandatory checks silently. If the current verification workflow has additional requirements, inspect and integrate them explicitly.
+
+5. OPTIONAL BUYER SHOP PROOF
+
+For BUYER registration only, add an optional section:
+
+“Shop Proof — Optional”
+
+Allow Admin to take one or more shop photos, using the application’s supported camera flow.
+
+Provide:
+- Take Photo.
+- Photo preview.
+- Retake/remove.
+- Capture timestamp.
+- Location capture status.
+
+Request camera and location permission only when Admin uses this feature.
+
+For each photo, capture and associate:
+- Uploaded photo reference.
+- Latitude and longitude, when permission is granted.
+- Location accuracy.
+- Location timestamp.
+- Photo capture timestamp.
+- Whether the image was captured through the camera or selected from storage.
+
+Capture the device location as close as practical to the photo-taking action.
+
+IMPORTANT LOCATION ACCURACY:
+Device coordinates are the Admin device’s reported location at capture time. Do not claim they prove the exact shop location or that they were extracted from the photograph.
+
+Do not silently reuse an old profile location or a previous photo’s coordinates.
+
+If gallery upload is supported, clearly label it as an uploaded image. Do not label the device’s current location as the historical location where that uploaded photo was taken.
+
+If permission is denied, location is unavailable, or capture fails:
+- Explain the issue.
+- Offer retry.
+- Allow Admin to skip the optional shop-proof section.
+- Do not block otherwise valid registration.
+- Never invent coordinates or mark missing location as verified.
+
+Do not enable continuous location tracking.
+
+Use the existing image-upload/storage system. Do not introduce a separate storage provider.
+
+6. DISPLAY BUYER SHOP PROOF AFTER REGISTRATION
+
+In the existing Admin buyer-details page, show:
+- Shop photo thumbnails.
+- Capture timestamp.
+- Location status.
+- Coordinates and accuracy when recorded.
+- Open Location action when valid coordinates exist.
+
+Restrict access to authorized users.
+
+Keep shop-proof coordinates separate from:
+- Buyer business-location fields.
+- Order delivery locations.
+- Seller pickup locations.
+
+Do not overwrite these locations automatically.
+
+7. ACCOUNT CREATION AND NORMAL LOGIN
+
+Create genuine accounts in the same role-specific structures used by normal registration.
+
+Reuse:
+- Existing public ID generation.
+- Phone normalization.
+- Duplicate-account rules.
+- Role-specific profile creation.
+- Existing document and image handling.
+
+After creation, the account must:
+- Appear in the correct Users & Partners tab.
+- Open correctly in account details.
+- Show the correct verification status.
+- Work with the existing normal login process.
+
+Admin registration must not:
+- Sign Admin out.
+- Switch the current session into the new account.
+- Store the new user as the current logged-in user.
+- Create a separate password or OTP system.
+- Change existing login/session behaviour.
+
+Do not send login messages or notifications unless an existing supported flow is intentionally reused.
+
+8. VALIDATION AND SAVE BEHAVIOUR
+
+Validate on both frontend and backend.
+
+Handle:
+- Missing required fields.
+- Invalid phone numbers and existing format rules.
+- Duplicate accounts.
+- Unsupported or oversized uploads.
+- Role-specific validation.
+- Unauthorized requests.
+- Repeated clicks and network retries.
+
+Use the existing duplicate policy, including whether one phone number can belong to multiple roles. Do not invent a new cross-role restriction.
+
+Use a transaction for connected database writes.
+
+Avoid partial accounts and duplicate public IDs. Handle uploaded-file cleanup safely when registration fails.
+
+Show a clear success result with:
+- Account name.
+- Role.
+- Public account ID.
+- Verification status.
+- View Account action.
+- Return to Directory action.
+
+Refresh directory lists, counts, and filters after successful creation.
+
+9. SECURITY AND AUDIT
+
+Use the existing server-verified Admin session.
+
+Never authorize registration or verification using only a public Admin ID supplied by the frontend.
+
+The backend must control:
+- Allowed account roles.
+- Verification status.
+- CreatedBy and verifiedBy.
+- Server timestamps.
+- Public ID generation.
+
+Record that the account was created by Admin and retain an audit trail.
+
+Protect uploaded documents, shop photos, and exact coordinates according to existing access rules.
+
+10. DO NOT DISTURB EXISTING CONNECTIONS
+
+Make only necessary changes.
+
+Do not unnecessarily modify:
+- Existing API paths or response fields.
+- Login, OTP, tokens, or session storage.
+- Normal self-registration.
+- Buyer quotations or orders.
+- Seller samples, pricing, or stock.
+- Transporter bidding or assignments.
+- Cancellation and reassignment.
+- Existing profile editing.
+- Existing image URLs or storage configuration.
+- Unrelated navigation, filters, styling, or dependencies.
+
+Extend existing APIs compatibly or add narrowly scoped Admin endpoints where needed.
+
+Do not rewrite unrelated modules or create duplicate .js/.jsx pages.
+
+11. VALIDATION BEFORE CALLING IT COMPLETE
+
+Test:
+- Registration for all four roles.
+- Checked and unchecked Admin verification.
+- Normal login for newly created accounts.
+- Admin session remaining unchanged.
+- Correct directory counts and account details.
+- Existing duplicate-account rules.
+- Required-field and role-specific validation.
+- Buyer shop photos with successful location capture.
+- Camera/location permission denial.
+- Skipping optional shop proof.
+- Upload failure and retry.
+- Duplicate submission prevention.
+- Unauthorized access.
+- Existing self-registration and profile editing remaining functional.
+
+Clearly distinguish actual integration tests from mocked or static checks.
+
+SUCCESS CRITERIA
+Admin can create Buyer, Stone Seller, Sand Seller, and Transporter accounts from Users & Partners using the same information and structures as their existing profiles.
+
+Admin can optionally verify the account during creation without a second Admin-verification step.
+
+Buyer registration supports optional shop photos with clearly labelled capture-time device location.
+
+Existing accounts, APIs, authentication, orders, and unrelated workflows continue working.
