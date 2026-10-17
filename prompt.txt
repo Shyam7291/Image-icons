@@ -1,0 +1,200 @@
+Implement cancellation and seller replacement for TRANSPORTER-CREATED MATERIAL ORDERS in the existing StoneRate application.
+
+GOAL
+We already have partial cancellation, full cancellation, seller replacement, and seller history for buyer orders. Implement the equivalent functionality for transporter-created orders using the same design and interaction patterns.
+
+These are orders where a transporter requests material from a seller. Do not confuse them with buyer orders where a transporter is assigned for delivery.
+
+The transporter must remain unchanged. There must be NO Add Transporter or Change Transporter option.
+
+1. COMPARE THE EXISTING WORKFLOWS FIRST
+Inspect the buyer-order implementation and the transporter-order implementation before editing.
+
+Reuse the existing cancellation design, seller search, confirmation flow, and history presentation where appropriate. Adapt the calculations to the transporter-order data model rather than copying buyer-specific logic blindly.
+
+2. PARTIAL CANCELLATION / QUANTITY REDUCTION
+Inside each material section, allow Admin to reduce the eligible remaining quantity.
+
+The popup should show:
+- Material name.
+- Original requested quantity.
+- Already cancelled quantity.
+- Revised target quantity.
+- Quantity protected by loading, loaded, dispatched, or completed work.
+- Quantity currently eligible for cancellation.
+- Correct recorded quantity unit.
+
+Admin enters the quantity to cancel and a mandatory reason, reviews the result, and explicitly confirms.
+
+Preserve the original requested quantity and record cancellation separately. Do not overwrite history or allow negative quantities, duplicate deductions, or cancellation beyond the eligible balance.
+
+3. FULL CANCELLATION
+Allow Admin to cancel all eligible remaining quantity for a material.
+
+Clearly distinguish:
+- Fully cancelling a material before any protected work.
+- Cancelling only the remaining eligible quantity when some work has already progressed.
+
+Never imply that loaded, dispatched, or completed quantities were cancelled when they were not.
+
+Match the existing buyer workflow for any order-level cancellation action, while validating every affected material and saving the operation consistently.
+
+4. QUANTITY UNITS AND VEHICLE PROTECTION
+Transporter orders can use tons, feet, or buckets. Use the actual recorded unit.
+
+Do not assume everything is measured in feet. Do not invent conversion ratios. Use recorded conversions only where the existing application supports them.
+
+Missing or incompatible quantities must block unsafe changes with a clear explanation.
+
+Preserve vehicles and quantities already in progress. Update untouched pending allocations to reflect the revised quantity without disrupting normal vehicle registration, editing, loading, dispatch, or delivery.
+
+Ensure cancelled quantities cannot reappear through:
+- Refresh.
+- Startup repairs.
+- Vehicle-number saving.
+- Vehicle allocation.
+- Delivery creation.
+- Admin closure.
+- Reopening an order.
+
+5. CHANGE SELLER
+Allow Admin to replace the seller for an entire material allocation.
+
+Example:
+- The complete 20mm material allocation moves to the replacement seller.
+- The complete 40mm material allocation can move independently.
+- Do not split one material between multiple sellers.
+
+Protect progressed work according to the existing buyer seller-change rules. Do not silently rewrite the seller identity on historical loading or delivery records.
+
+6. REAL SELLER/SAMPLE SEARCH
+Use real seller samples, not demo alternatives.
+
+Show compact search results containing:
+- Sample thumbnail.
+- Material name.
+- Sample/reference code.
+- Seller name and public ID.
+- Material rate with its unit.
+- Permit cost with its unit.
+
+Validate matching material, seller status, sample availability, expiry, stock, and unit compatibility.
+
+Mark the current seller as already assigned and prevent selecting the same seller as its own replacement.
+
+Before saving, show the current seller and replacement seller for review, require a reason, and ask for explicit confirmation.
+
+7. CONNECT THE SELLER REPLACEMENT PROPERLY
+Update the relevant allocation and operational references together:
+- Seller identity.
+- Selected sample and reference code.
+- Sample image.
+- Seller material rate.
+- Permit cost.
+- Pickup location.
+- Seller-facing order access.
+- Delivery references.
+- Relevant loading schedules and queue records.
+
+The old seller must no longer be able to operate the transferred allocation. The new seller must receive the correct material allocation.
+
+Keep the transporter unchanged.
+
+Preserve the original commercial snapshot. Do not silently change buyer quotation rates, final per-feet rates, invoices, payments, or unrelated financial totals.
+
+Follow the existing seller acceptance policy instead of inventing a new acceptance workflow.
+
+8. SELLER DETAILS AND HISTORY
+Add a small Seller Details link associated with each material, consistent with the buyer-order design.
+
+The popup should show the current seller:
+- Seller name.
+- Public seller ID.
+- Phone number.
+- Pickup location.
+- Sample image.
+- Sample/reference code.
+- Material name.
+- Material rate and unit.
+- Permit cost and unit.
+
+Show seller-change history newest first:
+- Previous seller → New seller.
+- Complete previous seller snapshot.
+- Complete replacement seller snapshot.
+- Quantity and unit affected.
+- Reason for change.
+- Timestamp in IST.
+- Admin identifier.
+
+Save immutable before/after snapshots at the time of reassignment. Later edits to seller profiles or samples must not rewrite history.
+
+For older records with missing historical fields, display “Not recorded.” Do not fill historical gaps with current profile information.
+
+If there has been no change, show the current seller and “No seller changes recorded.”
+
+9. SELLER AND TRANSPORTER DISPLAY
+Admin cancellation must appear on both the Seller and Transporter order views with:
+- Original quantity.
+- Cancelled quantity.
+- Revised target.
+- Reason and timestamp.
+- Appropriate active/history status.
+
+Fully cancelled material should not remain active work. Partially cancelled material should remain active for its remaining quantity.
+
+Preserve the existing distinction between Admin cancellation and transporter-originated cancellation. Do not introduce seller notices or quantity deductions for transporter cancellations where the existing business rule intentionally excludes them.
+
+10. SAND WORKFLOW
+If transporter orders support Sand, integrate its actual bucket quantities, loading schedules, queue cards, yard assignments, tokens, and delivery vehicles.
+
+Do not double-count linked queue and vehicle quantities. Do not leave records assigned to the previous seller after replacement.
+
+Do not silently disable Sand and call the implementation complete.
+
+11. DATA INTEGRITY AND SECURITY
+Use the existing verified Admin session. Do not trust a public Admin ID alone.
+
+Use transactions, ownership checks, appropriate record locks, save-time eligibility checks, stale-data protection, and duplicate-submission protection.
+
+If any connected update fails, roll back the operation.
+
+Keep audit history. Make any necessary database changes additive and repeatable.
+
+12. DO NOT DISTURB EXISTING CONNECTIONS
+Make only changes required for this feature.
+
+Do not unnecessarily modify:
+- API paths, route mounts, existing request fields, or response fields.
+- Login, OTP, token creation, session storage, or session expiry.
+- Buyer orders, quotations, acceptance, or pricing.
+- Existing transporter reassignment for buyer orders.
+- Vehicle registration and normal loading/dispatch behaviour.
+- Seller sample uploads or image storage.
+- Bidding, profiles, unrelated notifications, navigation, or filters.
+- Unrelated styling or dependencies.
+
+Do not introduce another OTP prompt or force logout as a workaround.
+
+Do not create duplicate .js and .jsx pages. Follow the actual imports and repository filenames.
+
+13. VALIDATION
+Check:
+- Partial and full eligible cancellation.
+- Repeated submissions.
+- Invalid, excessive, negative, and decimal quantities.
+- Ton, feet, and bucket handling.
+- Loading, loaded, dispatched, and completed protections.
+- Vehicle editing after quantity reduction.
+- Refresh/restart not restoring cancelled quantities.
+- Seller replacement and access changes.
+- Immutable seller history.
+- Unavailable, expired, insufficient-stock, and incompatible-unit samples.
+- Closure and reopening.
+- Concurrent or stale Admin changes.
+- Existing buyer, seller, transporter, and Sand workflows.
+
+Clearly distinguish actual tests from mocked or static checks. Do not claim live database or browser validation unless it was performed.
+
+SUCCESS CRITERIA
+Admin can manage partial cancellation, full eligible cancellation, and whole-material seller replacement for transporter-created orders using the established buyer-order design. Admin, Seller, and Transporter views remain consistent. The transporter stays unchanged, historical records remain accurate, and existing APIs and unrelated workflows continue working.
