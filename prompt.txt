@@ -1,277 +1,377 @@
-Implement Admin-assisted registration in StoneRate’s existing Users & Partners section.
+Implement saved business locations in StoneRate, starting with Stone Seller, then Buyer and Sand Seller.
 
-GOAL
-The existing “Register New Buyer” and equivalent buttons for Stone Seller, Sand Seller, and Transporter must work.
+Read this entire brief before editing. Preserve the existing application’s working connections, APIs, authentication, profiles, and order workflows.
 
-Admin should be able to create an account on behalf of any of these four roles through a dedicated registration page, fill in the relevant profile information, and optionally mark the account as Admin-verified during registration.
+1. OVERALL PLAN
 
-Do not add Admin-account creation to this feature.
+PHASE 1 — IMPLEMENT FIRST
+Add a draggable location picker to:
+- Stone Seller profile: exact plant/shop entrance.
+- Sand Seller profile: exact yard/shop entrance.
+- Buyer profile: exact business/shop location.
 
-1. INSPECT EXISTING IMPLEMENTATION FIRST
+Save the confirmed coordinates permanently against the appropriate account in the existing PostgreSQL database.
 
-Read the actual profile pages, registration flows, APIs, database tables, and verification logic for:
-- Buyer.
-- Stone Seller.
-- Sand Seller.
-- Transporter.
+PHASE 2 — PLANNED NEXT
+For sellers, automatically generate a nearby road arrival point approximately 100 metres from the private plant/yard location.
 
-Also inspect:
-- Users & Partners directory.
-- Individual account-details pages.
-- Existing Admin verification actions.
-- Existing image/document upload services.
-- Navigation and route registration.
+Transporters will navigate to this nearby point and call Admin for exact pickup directions.
 
-Use the existing profile fields, field names, validation rules, dropdown sources, and storage structure.
+Do not ask sellers to place a second meeting-point pin.
 
-Do not guess the required fields or create a second account system.
+Do not confuse Phase 2 with the earlier circle proposal. The latest agreed approach is a saved nearby-road destination, not a required 200 m or 500 m circle.
 
-2. CONNECT THE EXISTING REGISTER BUTTONS
+Complete and validate Phase 1 before connecting Phase 2.
 
-Each role’s existing Register button should open a dedicated registration page with the correct role selected.
+2. SETUP ALREADY COMPLETED
 
-Examples:
-- Buyers → Register New Buyer.
-- Stone Sellers → Register New Stone Seller.
-- Sand Sellers → Register New Sand Seller.
-- Transporters → Register New Transporter.
+The owner has:
+- Created/activated Google Cloud billing.
+- Enabled Maps JavaScript API.
+- Created a website-restricted API key.
+- Restricted that key to Maps JavaScript API only.
+- Added this allowed website referrer:
 
-Use one reusable role-aware page if suitable, with role-specific form sections.
+  https://my-app-frontend-da9o.onrender.com/*
 
-The page should include:
-- Clear role-specific heading.
-- Back navigation.
-- Relevant profile sections.
-- Required-field indicators.
-- Existing dropdowns and upload controls.
-- Admin verification checkbox near the bottom.
-- Review and Create Account actions.
+In the Render FRONTEND service, the owner has added:
 
-Preserve the existing Users & Partners design.
+  REACT_APP_GOOGLE_MAPS_API_KEY
 
-3. COLLECT THE SAME INFORMATION AS EXISTING PROFILES
+Its value is the restricted Google Maps browser key.
 
-Inspect each role’s profile page and collect the same applicable information during Admin registration.
+The owner saved and deployed the frontend environment-variable change.
 
-This may include identity/contact information, business information, address, operating locations, documents, and role-specific details, but the actual source code must determine the exact fields.
+Do not ask the owner to paste the API key into chat or commit it to GitHub.
 
-Preserve the distinction between:
-- Fields required to create an account.
-- Fields required for a complete profile.
-- Optional fields.
+Do not assume any map-picker code has already been implemented. The environment variable alone does not create the feature.
 
-Do not silently omit required role-specific data or introduce new mandatory fields without justification.
+Do not assume Roads API, Places API, Geocoding API, native Android maps, or Android API keys are configured.
 
-Reuse existing Admin Settings dropdowns and reference data. Do not hard-code replacement lists.
+3. APPLICATION CONTEXT
 
-4. ADMIN VERIFICATION CHECKBOX
+StoneRate has separate frontend and backend GitHub repositories.
 
-Near the bottom, add:
+Render hosts the testing website and backend.
 
-“Mark this account as Admin verified”
+The Android app is also used through closed testing. It does not simply open the Render website. The long-term intention is to use the Android app.
 
-Keep it unchecked by default.
+Inspect the actual frontend build and Android packaging before choosing the mobile map integration.
 
-When checked:
-- Create the account with the existing Admin-verified status.
-- Save verifiedBy using the authenticated Admin identity.
-- Save verifiedAt using the server timestamp.
-- Record that verification occurred during Admin-assisted registration.
-- Do not require the same account to pass through the existing Admin verification queue again.
+The repository has previously included Capacitor configuration and Android/Gradle files. Verify the current implementation rather than assuming it is a fully native app.
 
-When unchecked:
-- Create the account with the existing pending/unverified status.
-- Preserve the normal verification workflow.
+4. INSPECT EXISTING CODE FIRST
 
-Use the same verification fields and rules already used by the application.
+Read:
+- Stone Seller profile page.
+- Buyer profile page.
+- Sand Seller profile page.
+- Existing profile API helpers.
+- Backend routes that read/update these profiles.
+- Database initialization/migrations.
+- Current verified authentication and account ownership checks.
+- Admin account-details pages.
+- Frontend package.json.
+- Android/Capacitor configuration and build pipeline.
 
-IMPORTANT:
-Admin business/account verification is not automatically proof of phone ownership, email ownership, or document authenticity.
+Known Stone Seller connection:
 
-Do not set phoneVerified or emailVerified merely because Admin checked this box.
+SellerProfilePage imports these from ../api/profileApi:
+- getCurrentSeller
+- getSellerProfile
+- updateSellerProfile
+- uploadSellerProfilePhoto
 
-Do not bypass existing mandatory checks silently. If the current verification workflow has additional requirements, inspect and integrate them explicitly.
+Use these existing connections as the starting point.
 
-5. OPTIONAL BUYER SHOP PROOF
+Do not replace the profile API with a separate account system.
 
-For BUYER registration only, add an optional section:
+5. LOCATION-PICKER USER EXPERIENCE
 
-“Shop Proof — Optional”
+Add a compact section near the existing address:
 
-Allow Admin to take one or more shop photos, using the application’s supported camera flow.
+Business Location
+- “Location not added” if no saved pin exists.
+- “Location saved” and last-updated information when available.
+- Set Location / Edit Location button.
 
-Provide:
-- Take Photo.
-- Photo preview.
-- Retake/remove.
-- Capture timestamp.
-- Location capture status.
+Only open/load the map when the user clicks Set/Edit Location.
 
-Request camera and location permission only when Admin uses this feature.
+Inside the picker:
+- Show a draggable pin.
+- Allow touch dragging on mobile.
+- Allow selecting a point by tapping/clicking the map if appropriate.
+- Provide optional “Use my current location.”
+- Explain that the pin must identify the business entrance, not necessarily the phone’s current position.
+- Provide Confirm Location and Cancel.
+- Show saving, failure, retry, and success states.
 
-For each photo, capture and associate:
-- Uploaded photo reference.
-- Latitude and longitude, when permission is granted.
-- Location accuracy.
-- Location timestamp.
-- Photo capture timestamp.
-- Whether the image was captured through the camera or selected from storage.
+Do not save automatically on every drag.
+Do not save the initial default map centre as the user’s location.
+Cancel must leave the existing saved location unchanged.
 
-Capture the device location as close as practical to the photo-taking action.
+For an existing location, reopen at the saved pin.
 
-IMPORTANT LOCATION ACCURACY:
-Device coordinates are the Admin device’s reported location at capture time. Do not claim they prove the exact shop location or that they were extracted from the photograph.
+For a new location:
+- Offer device location only with permission.
+- If permission is denied, allow manual map positioning.
+- Never claim a fallback/default position is the user’s actual location.
 
-Do not silently reuse an old profile location or a previous photo’s coordinates.
+Keep the written address editable through the existing profile flow.
 
-If gallery upload is supported, clearly label it as an uploaded image. Do not label the device’s current location as the historical location where that uploaded photo was taken.
+Address autocomplete and reverse geocoding are not required for Phase 1. Do not enable separately billed services merely to populate an address automatically.
 
-If permission is denied, location is unavailable, or capture fails:
-- Explain the issue.
-- Offer retry.
-- Allow Admin to skip the optional shop-proof section.
-- Do not block otherwise valid registration.
-- Never invent coordinates or mark missing location as verified.
+6. SHARED COMPONENT
 
-Do not enable continuous location tracking.
+Create a reusable location-picker component or equivalent shared implementation for all three roles.
 
-Use the existing image-upload/storage system. Do not introduce a separate storage provider.
+Keep role-specific labels:
+- Stone Seller: Plant Location.
+- Sand Seller: Yard/Shop Location.
+- Buyer: Business/Shop Location.
 
-6. DISPLAY BUYER SHOP PROOF AFTER REGISTRATION
+Match the existing application design.
 
-In the existing Admin buyer-details page, show:
-- Shop photo thumbnails.
-- Capture timestamp.
-- Location status.
-- Coordinates and accuracy when recorded.
-- Open Location action when valid coordinates exist.
+Load the Maps JavaScript library once per application session as appropriate, avoid duplicate script injection, and clean up event listeners.
 
-Restrict access to authorized users.
+Do not recreate the map on every React render or pin movement.
 
-Keep shop-proof coordinates separate from:
-- Buyer business-location fields.
-- Order delivery locations.
-- Seller pickup locations.
+Use supported Google Maps marker APIs. If the chosen implementation requires a map ID, explain and configure that requirement explicitly. Do not assume one already exists.
 
-Do not overwrite these locations automatically.
+7. DATABASE STORAGE
 
-7. ACCOUNT CREATION AND NORMAL LOGIN
+Store confirmed coordinates in PostgreSQL against the existing account.
 
-Create genuine accounts in the same role-specific structures used by normal registration.
+Do not store them:
+- In a frontend source file.
+- In GitHub configuration.
+- Only in localStorage.
+- Only in component state.
 
-Reuse:
-- Existing public ID generation.
-- Phone normalization.
-- Duplicate-account rules.
-- Role-specific profile creation.
-- Existing document and image handling.
+Suggested logical fields, adapted to the actual schema:
+- businessLatitude
+- businessLongitude
+- businessLocationUpdatedAt
+- businessLocationSource
+- locationVersion
 
-After creation, the account must:
-- Appear in the correct Users & Partners tab.
-- Open correctly in account details.
-- Show the correct verification status.
-- Work with the existing normal login process.
+Store device accuracy only if actually obtained. A manually adjusted pin must not inherit a misleading GPS accuracy claim.
 
-Admin registration must not:
-- Sign Admin out.
-- Switch the current session into the new account.
-- Store the new user as the current logged-in user.
-- Create a separate password or OTP system.
-- Change existing login/session behaviour.
+Use additive, repeatable schema changes.
 
-Do not send login messages or notifications unless an existing supported flow is intentionally reused.
+Keep these concepts separate:
+- User-confirmed business coordinates.
+- Existing written address.
+- Buyer order delivery coordinates.
+- Historical order pickup locations.
+- Future Google Roads-derived arrival-point cache.
 
-8. VALIDATION AND SAVE BEHAVIOUR
+Changing a profile location must not silently rewrite locations already recorded on confirmed orders.
 
-Validate on both frontend and backend.
+Do not invent coordinates for old accounts.
 
-Handle:
-- Missing required fields.
-- Invalid phone numbers and existing format rules.
-- Duplicate accounts.
-- Unsupported or oversized uploads.
-- Role-specific validation.
-- Unauthorized requests.
-- Repeated clicks and network retries.
+8. API AND ACCESS CONTROL
 
-Use the existing duplicate policy, including whether one phone number can belong to multiple roles. Do not invent a new cross-role restriction.
+Reuse existing verified authentication.
 
-Use a transaction for connected database writes.
+A user can read/update only the account location they are authorized to manage.
 
-Avoid partial accounts and duplicate public IDs. Handle uploaded-file cleanup safely when registration fails.
+Admin can view exact locations through existing authorized account-details access.
 
-Show a clear success result with:
-- Account name.
-- Role.
-- Public account ID.
-- Verification status.
-- View Account action.
-- Return to Directory action.
+Validate coordinates on the backend:
+- Numeric and finite.
+- Latitude between -90 and 90.
+- Longitude between -180 and 180.
+- Both coordinates supplied together.
+- Zero is a valid numeric coordinate, not automatically “missing.”
 
-Refresh directory lists, counts, and filters after successful creation.
+Do not trust a public seller/buyer ID alone as authorization.
 
-9. SECURITY AND AUDIT
+Keep existing profile response fields compatible.
 
-Use the existing server-verified Admin session.
+Prevent unrelated profile saves from clearing a saved pin when location fields are omitted.
 
-Never authorize registration or verification using only a public Admin ID supplied by the frontend.
+Use explicit location updates or equivalent safe merge semantics.
 
-The backend must control:
-- Allowed account roles.
-- Verification status.
-- CreatedBy and verifiedBy.
-- Server timestamps.
-- Public ID generation.
+Return the persisted database values after saving.
 
-Record that the account was created by Admin and retain an audit trail.
+Local storage may cache profile data for UI continuity, but PostgreSQL is the source of truth.
 
-Protect uploaded documents, shop photos, and exact coordinates according to existing access rules.
+9. PRIVACY
 
-10. DO NOT DISTURB EXISTING CONNECTIONS
+Exact seller coordinates are private to:
+- The seller/account owner.
+- Authorized Admin users.
 
-Make only necessary changes.
+Do not accidentally include exact seller coordinates in:
+- Public sample/catalogue responses.
+- Transporter order responses.
+- Public profile payloads.
+- Notifications.
+- Navigation links intended to hide the plant.
+- Client-visible debugging data.
 
-Do not unnecessarily modify:
-- Existing API paths or response fields.
-- Login, OTP, tokens, or session storage.
-- Normal self-registration.
-- Buyer quotations or orders.
-- Seller samples, pricing, or stock.
-- Transporter bidding or assignments.
-- Cancellation and reassignment.
-- Existing profile editing.
-- Existing image URLs or storage configuration.
-- Unrelated navigation, filters, styling, or dependencies.
+Do not rely on hiding coordinates in the UI while still returning them through the API.
 
-Extend existing APIs compatibly or add narrowly scoped Admin endpoints where needed.
+Buyer business location must remain separate from order delivery destinations. Do not apply the seller’s approximate-location policy to buyer delivery navigation without a separate business decision.
 
-Do not rewrite unrelated modules or create duplicate .js/.jsx pages.
+This is saved business-location functionality, not continuous tracking.
 
-11. VALIDATION BEFORE CALLING IT COMPLETE
+10. ADMIN DISPLAY
 
-Test:
-- Registration for all four roles.
-- Checked and unchecked Admin verification.
-- Normal login for newly created accounts.
-- Admin session remaining unchanged.
-- Correct directory counts and account details.
-- Existing duplicate-account rules.
-- Required-field and role-specific validation.
-- Buyer shop photos with successful location capture.
-- Camera/location permission denial.
-- Skipping optional shop proof.
-- Upload failure and retry.
-- Duplicate submission prevention.
-- Unauthorized access.
-- Existing self-registration and profile editing remaining functional.
+In the existing Admin account-details page:
+- Show whether a business location exists.
+- Show the last-updated timestamp.
+- Provide View Location / Open in Maps for authorized Admin users.
+- Show “Location not added” for older accounts.
 
-Clearly distinguish actual integration tests from mocked or static checks.
+Do not automatically load an embedded map for every account card or directory row.
 
-SUCCESS CRITERIA
-Admin can create Buyer, Stone Seller, Sand Seller, and Transporter accounts from Users & Partners using the same information and structures as their existing profiles.
+11. ANDROID SUPPORT
 
-Admin can optionally verify the account during creation without a second Admin-verification step.
+The feature must eventually work on both:
+- Render testing website.
+- Installed Android app.
 
-Buyer registration supports optional shop photos with clearly labelled capture-time device location.
+The existing website-restricted key covers the Render website only.
 
-Existing accounts, APIs, authentication, orders, and unrelated workflows continue working.
+Inspect whether the Android app uses bundled web code, a WebView, or native map components.
+
+Do not assume:
+- Android application restrictions work with Maps JavaScript API.
+- A Render website restriction authorizes locally bundled Android content.
+- Render environment variables automatically reach the Android build pipeline.
+
+Use appropriately restricted keys for the chosen platform/API.
+
+If native Android maps are used, configure the relevant SDK, package name, and actual signing-certificate fingerprint, including Play App Signing where applicable.
+
+If the Android build uses web code, verify supported origin/referrer behaviour before choosing the integration.
+
+Do not remove key restrictions or use an unrestricted key to make the app work.
+
+Document any additional Android setup and build-time variables needed.
+
+12. COST-SAVING DESIGN
+
+- Load maps only when Set/Edit Location or View Location is clicked.
+- Do not automatically mount maps on profiles, samples, order cards, or account lists.
+- Save confirmed coordinates and reuse them.
+- Do not geocode on every drag.
+- Do not enable Places, Geocoding, Routes, or Roads until actually required.
+- Do not capture Google map screenshots and permanently serve them as a workaround for API billing.
+- Use external Google Maps navigation links where suitable instead of an embedded navigation experience.
+- Configure usage monitoring, quotas where supported, and billing alerts.
+- Do not claim alerts alone stop spending.
+- Do not promise zero cost or hard-code free allowances without checking current pricing.
+
+A browser API key can be visible in the compiled frontend. Protect it with application/API restrictions; an environment variable does not make a browser key secret.
+
+13. PHASE 2: AUTOMATIC NEARBY ROAD DESTINATION
+
+This is the agreed future seller-navigation plan.
+
+Seller sets only the private plant/yard pin.
+
+Backend:
+- Generates candidate points approximately 100 metres around that pin.
+- Uses Nearest Roads API to obtain road-matched candidates.
+- Measures the returned points’ distance from the private location.
+- Selects a candidate within a documented acceptable range.
+- Saves it as a separate nearby arrival-point cache.
+
+Nearest Roads does not directly mean “find a point exactly 100 metres from the plant.” Do not assume the snapped result remains 100 metres away.
+
+Use approximate straight-line distance terminology, not guaranteed driving distance.
+
+Road matching does not prove truck access, legal stopping, or connection to the plant entrance. Handle unavailable/ambiguous results without inventing a safe destination.
+
+The transporter receives:
+- Nearby arrival-point coordinates only.
+- “Navigate to nearby arrival point.”
+- “Call Admin for final pickup directions.”
+
+Admin retains the private exact plant location.
+
+Do not expose the exact plant as a fallback if road lookup fails.
+
+14. PHASE 2 CACHE AND REFRESH PLAN
+
+Keep Google Roads-derived data separate from the user-confirmed private pin.
+
+Store:
+- Nearby latitude/longitude.
+- Retrieved-at timestamp.
+- Expires-at timestamp.
+- Source plant-location version.
+- Refresh status and limited retry metadata.
+
+Comply with the applicable Google Roads retention terms. The discussed maximum cache period is 30 consecutive calendar days; verify current terms before implementation.
+
+Do not keep expired coordinates in active records, event payloads, or logs indefinitely. Include retention handling for copies and backups as required.
+
+Refresh rules:
+- Reuse valid coordinates.
+- Treat a seller with a successful sample upload in the last five days as recently active for this refresh policy.
+- This must NOT change the seller’s actual account activation status.
+- For recently active sellers, refresh near expiry.
+- For a returning inactive seller, trigger refresh after a successful sample upload if the cache is missing/expired.
+- Include sellers with ongoing orders even without recent uploads.
+- Check/prepare the arrival point at order confirmation or assignment.
+- Keep a navigation-click fallback for missing/expired data.
+- Delete expired data regardless of activity.
+- Do not refresh every inactive seller every month.
+
+A Roads API failure must not fail a sample upload.
+
+Use bounded retries, request deduplication, and one refresh per plant/version.
+
+If the plant pin changes while a refresh is running, reject the stale result.
+
+Use a real scheduled job/worker supported by the deployment environment. Do not assume an unreliable frontend timer or an unconfigured background process exists.
+
+Roads API calls must use a separate backend-only credential, not the browser key.
+
+15. CHANGE BOUNDARIES
+
+Do not unnecessarily change:
+- Login, OTP, sessions, or token expiry.
+- Existing API routes and payloads.
+- Profile-photo uploads.
+- Cloudflare R2 configuration.
+- Sample uploads and stock.
+- Buyer quotations or prices.
+- Order cancellation or seller/transporter reassignment.
+- Vehicle allocation, loading, dispatch, or delivery.
+- Existing navigation and filters.
+- Unrelated styling or dependencies.
+
+Preserve all existing working connections.
+
+16. VALIDATION AND HANDOFF
+
+Validate:
+- First save and later edit for each role.
+- Persistence after refresh and normal login.
+- Cancel without saving.
+- Permission denial and manual selection.
+- Map-load failure and retry.
+- Invalid coordinates.
+- Cross-account access rejection.
+- Existing profile saves preserving coordinates.
+- Exact seller coordinates absent from transporter/public APIs.
+- Android and Render separately.
+- No duplicate script loads or repeated map creation.
+- Existing profile and order workflows remaining unchanged.
+
+Clearly distinguish static/mocked checks from actual database and browser tests.
+
+Explain:
+- Files changed and why.
+- Required migrations.
+- Existing versus additional environment configuration.
+- Backend/frontend/Android deployment order.
+- Tests actually executed.
+- Any remaining blockers.
+
+Do not call the implementation complete while Android support, permanent saving, or access controls are merely assumed.
